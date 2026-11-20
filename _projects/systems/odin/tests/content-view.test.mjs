@@ -47,6 +47,14 @@ test('fillFields writes nothing when the record lacks a field the page shows', (
   assert.equal(fields.name.textContent, '');
 });
 
+test('fillFields refuses text with nothing in it, and writes nothing', () => {
+  for (const blank of ['', '   ', '\n\t']) {
+    const { root, fields } = page();
+    assert.throws(() => fillFields(root, { ...RECORD, phone: blank }), /no usable value for: phone/, JSON.stringify(blank));
+    assert.equal(fields.name.textContent, '');
+  }
+});
+
 test('fillFields does not take text the record only inherits', () => {
   const { root, fields } = page({ fields: ['name'] });
   assert.throws(() => fillFields(root, Object.create({ name: 'Inherited' })), /no usable value for: name/);
@@ -138,6 +146,26 @@ test('showContent leaves the unavailable block showing even when the report fail
   const broken = () => { throw new Error('the reporter broke'); };
   await assert.rejects(showContent({ root, load: async () => { throw new Error('Flask is down'); }, report: broken }), /the reporter broke/);
   assert.deepEqual(showing(blocks), ['unavailable']);
+});
+
+test('showContent fills and clears the way it is told to', async () => {
+  const { root, blocks } = page();
+  const calls = [];
+  const fill = (target, loaded) => calls.push(['fill', target === root, loaded]);
+  const clear = (target) => calls.push(['clear', target === root]);
+  assert.equal(await showContent({ root, load: async () => 'the content', report: () => {}, fill, clear }), true);
+  assert.deepEqual(calls, [['fill', true, 'the content']]);
+  const failing = () => { throw new Error('cannot fill'); };
+  assert.equal(await showContent({ root, load: async () => 'the content', report: () => {}, fill: failing, clear }), false);
+  assert.deepEqual(calls.at(-1), ['clear', true]);
+  assert.deepEqual(showing(blocks), ['unavailable']);
+});
+
+test('showContent switches to the loading block before it asks for content', async () => {
+  const { root, blocks } = page({ showing: 'ready' });
+  let seen;
+  await showContent({ root, load: async () => { seen = showing(blocks); return RECORD; }, report: () => {} });
+  assert.deepEqual(seen, ['loading']);
 });
 
 test('showContent on a page missing a block fails before it asks for content', async () => {

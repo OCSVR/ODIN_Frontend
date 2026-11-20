@@ -32,7 +32,7 @@ export function createContent(flask, { timeLimitMs = DEFAULT_TIME_LIMIT_MS } = {
       return textRecord(await ask(SITE_PATH), SITE_FIELDS, SITE_PATH);
     },
 
-    // One page's sections, in the order the page shows them. `name` is the page's name, such as home.
+    // One page's sections. `name` is the page's name, such as home.
     async page(name) {
       const path = `${PAGE_PATH}?name=${encodeURIComponent(name)}`;
       return sectionList(await ask(path), path);

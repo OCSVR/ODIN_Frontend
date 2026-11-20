@@ -125,8 +125,24 @@ test('the layout leaves the company\'s name out of the page title', () => {
 test('the ODIN home page is the only page at the site root', () => {
   const home = readFileSync(new URL('pages/home.md', system), 'utf8');
   assert.match(home, /^permalink: \/$/m, 'pages/home.md is not at the site root');
-  for (const name of ['index.md', 'index.html']) {
+  for (const name of ['index.md', 'index.markdown', 'index.html']) {
     assert.ok(!existsSync(new URL(name, root)), `${name} at the repo root would also claim the site root`);
+  }
+});
+
+// A misspelled mark makes its page unavailable for every visitor, so the marks are checked here.
+const SECTION_PARTS = ['kicker', 'title', 'text', 'action'];
+
+test('each page names only parts the backend sends, and has all three state blocks', () => {
+  for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
+    const markup = readFileSync(new URL(`pages/${name}`, system), 'utf8');
+    const states = [...markup.matchAll(/data-odin-state="([^"]+)"/g)].map(([, state]) => state).sort();
+    assert.deepEqual(states, ['loading', 'ready', 'unavailable'], `${name} does not have the three state blocks`);
+    const fields = [...markup.matchAll(/data-odin-field="([^"]+)"/g)].map(([, field]) => field);
+    assert.ok(fields.length > 0, `${name} marks no field`);
+    for (const field of fields) {
+      assert.ok([...SITE_FIELDS, ...SECTION_PARTS].includes(field), `${name} marks the field ${field}, which the backend does not send`);
+    }
   }
 });
 

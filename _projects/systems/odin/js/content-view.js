@@ -7,13 +7,18 @@
 
 const STATES = ['loading', 'ready', 'unavailable'];
 
+// Text a visitor can read: a string with something in it besides spaces.
+export function isText(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
 // Each kind of mark: where the markup names the record's key, what value it accepts, and how the
 // value is written and taken away again. A link is written only when it is an https address.
 const MARKS = [
   {
     selector: '[data-odin-field]',
     key: 'odinField',
-    accepts: (value) => typeof value === 'string',
+    accepts: isText,
     write: (element, value) => { element.textContent = value; },
     clear: (element) => { element.textContent = ''; },
   },
@@ -72,15 +77,17 @@ export function clearFields(root) {
   }
 }
 
-// Loads one record with `load` and shows it in `root`. The visitor sees the whole record or the
-// unavailable block, never part of each. Resolves to whether the content is showing.
-export async function showContent({ root, load, report = console.error }) {
+// Loads content with `load` and shows it in `root`. The visitor sees all of it or the unavailable
+// block, never part of each. Resolves to whether the content is showing. `fill` and `clear` say how
+// the content is written and taken away again; by default it is one record.
+export async function showContent({ root, load, report = console.error, fill = fillFields, clear = clearFields }) {
   showState(root, 'loading');
   try {
-    fillFields(root, await load());
+    fill(root, await load());
   } catch (error) {
-    clearFields(root);
-    // The page is put right before the report, so a reporter that fails cannot leave it loading.
+    clear(root);
+    // Show the unavailable block before reporting, so a reporter that throws cannot leave the page
+    // on its loading message.
     showState(root, 'unavailable');
     report('ODIN content could not be shown.', error);
     return false;

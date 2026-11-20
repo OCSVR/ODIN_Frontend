@@ -1,28 +1,31 @@
 ---
 layout: projects/odin/site
 title: Home
-description: ODIN Diagnostics, eye-tracking technology for concussion assessments.
 permalink: /
 ---
 
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
-<div class="ocs__container" data-odin-page role="status">
-  <div data-odin-state="loading">
-    <p class="ocs__text">Loading the page.</p>
-  </div>
-  <div data-odin-state="unavailable" hidden>
-    <p class="ocs__callout">This page's content is unavailable. The backend did not answer, or it has no content yet.</p>
+<div class="ocs__container ocs__container--fill" data-odin-page>
+  <div role="status">
+    <div data-odin-state="loading" hidden>
+      <p class="ocs__text">Loading the page.</p>
+    </div>
+    <div data-odin-state="unavailable" hidden>
+      <p class="ocs__callout">This page can't load right now. Please try again in a few minutes.</p>
+    </div>
   </div>
   <div data-odin-state="ready" hidden>
-    <section class="odin__hero" data-odin-section="hero">
+    <section class="ocs__split odin__hero" data-odin-section="hero">
       <div>
-        <p class="odin__kicker" data-odin-field="kicker"></p>
+        <p class="ocs__text odin__kicker" data-odin-field="kicker"></p>
         <h1 class="odin__hero-title" data-odin-field="title"></h1>
         <p class="ocs__lead" data-odin-field="text"></p>
         <a class="ocs__btn medium accent fill" href="#contact" data-odin-field="action"></a>
       </div>
-      <img class="odin__hero-image" data-odin-image alt="">
+      <div>
+        <img class="odin__hero-image" data-odin-image alt="">
+      </div>
     </section>
   </div>
   <noscript>

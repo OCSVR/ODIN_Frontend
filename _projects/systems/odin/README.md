@@ -35,7 +35,8 @@ A page's main heading is an `h1`. Another project's stylesheet hides every `h1`
 on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
-start with `odin__`. Page content uses the shared OCS grammar.
+start with `odin__`. Page content uses the shared OCS grammar. The hero adds a
+few `odin__` classes for its sizes.
 
 ## The scripts
 
@@ -44,7 +45,8 @@ start with `odin__`. Page content uses the shared OCS grammar.
   `logo_dark`. It throws `ContentUnavailableError` when Flask is down, takes
   longer than eight seconds, or answers without text for one of them.
   `page(name)` returns the sections of one page from
-  `GET /api/odin/page?name=<name>`, in the order the page shows them.
+  `GET /api/odin/page?name=<name>`. It throws the same error when the answer is
+  not a list of named sections.
   `imageUrl(name)` gives the address of an image by its file name.
 - `js/content-view.js` shows a record in the page. `showContent` shows one of
   three blocks marked `data-odin-state`: `loading`, `ready` or `unavailable`.
@@ -53,22 +55,29 @@ start with `odin__`. Page content uses the shared OCS grammar.
   the visitor sees the unavailable block and no content.
 - `js/page-view.js` shows a page built from sections. `showPage` uses the same
   three blocks. Each section's element is marked `data-odin-section="<name>"`,
-  and inside it `data-odin-field` takes a part's text (`kicker`, `title`, `text`,
-  `action`), `data-odin-href="link"` the section's link and `data-odin-image` its
-  image with its description. A part the markup asks for must be in the section,
-  or the whole page is unavailable.
+  and inside it:
+  - `data-odin-field="<part>"` takes a part's text: `kicker`, `title`, `text` or
+    `action`.
+  - `data-odin-image` takes the section's image and its description.
+
+  A part the markup asks for must be in the section with text in it, or the
+  whole page is unavailable.
 - `js/site-frame.js` runs the header and footer: `startFrame` starts the phone
   menu, fills the parts marked `data-odin-frame` and picks the logos.
 
 A page's own script imports `assets/js/api/config.js` and Login's
 `assets/js/login/backend.js` with `{{ site.baseurl }}`, builds the Flask backend
 and hands it to these modules, as `pages/connection.md` does. The modules never
-import `config.js`. If one later imports the other, use a `./` path.
+import `config.js`. `page-view.js` imports `content-view.js` with a `./` path. Do
+the same for any other import between the modules.
 
 The wording of the loading and unavailable blocks is in the page's markup. A
 page needs all three blocks. Put each state on a plain `div`, because a class
-that sets `display` would override the `hidden` attribute, and give the
-element around them `role="status"` so a screen reader announces the change.
+that sets `display` would override the `hidden` attribute. Give the element
+around the loading and unavailable blocks `role="status"`, so a screen reader
+announces those two messages. Keep the ready block outside it, or the whole page
+is read out as one announcement. On the home page all three start hidden, so a
+visitor without JavaScript sees only the note that the page needs it.
 
 ## Resources
 
@@ -105,7 +114,8 @@ make -C _projects/systems/odin build
 node --test _projects/systems/odin/tests/*.test.mjs
 ```
 
-To check the connection in a browser, start Flask on port 8587 and the site
-with `make`, then open `http://localhost:4500/ODIN_Frontend/odin/connection/`.
+To check the pages in a browser, start Flask on port 8587 and the site with
+`make`. The home page is at `http://localhost:4500/ODIN_Frontend/` and the
+connection check at `http://localhost:4500/ODIN_Frontend/odin/connection/`.
 Stop Flask and
 reload to see the unavailable message.

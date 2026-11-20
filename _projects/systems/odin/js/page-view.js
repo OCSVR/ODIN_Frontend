@@ -1,17 +1,13 @@
-// Shows a page that is built from sections. The page's markup holds the same three blocks as
-// content-view.js uses (loading, ready, unavailable). Inside the ready block, each section's
-// element is marked data-odin-section="<name>" and says where the section's parts go:
-//   data-odin-field="<part>"  a part's text: kicker, title, text or action
-//   data-odin-href="link"     the section's link
-//   data-odin-image           the section's image, with its description
-// A part the markup asks for must be in the section, or the whole page is unavailable.
+// Shows a page that is built from sections. Each section's element is marked
+// data-odin-section="<name>"; the README lists the marks that go inside it. A part the markup asks
+// for must be in the section, or the whole page is unavailable.
 
-import { clearFields, fillFields, showState } from './content-view.js';
+import { clearFields, fillFields, isText, showContent } from './content-view.js';
 
 // Puts a section's image into each place marked for it.
 function fillImages(element, section, imageUrl) {
   for (const image of element.querySelectorAll('[data-odin-image]')) {
-    if (typeof section.image !== 'string' || typeof section.image_alt !== 'string') {
+    if (!isText(section.image) || !isText(section.image_alt)) {
       throw new Error(`The ${section.name} section has no image`);
     }
     image.setAttribute('src', imageUrl(section.image));
@@ -22,7 +18,10 @@ function fillImages(element, section, imageUrl) {
 // Writes each section into the element marked for it. Values go in as text and attributes, never
 // as HTML.
 export function fillSections(root, sections, { imageUrl }) {
-  for (const element of root.querySelectorAll('[data-odin-section]')) {
+  const elements = [...root.querySelectorAll('[data-odin-section]')];
+  // A page whose marks are misspelled would otherwise show as ready with nothing in it
+  if (elements.length === 0) throw new Error('The page marks no section');
+  for (const element of elements) {
     const name = element.dataset.odinSection;
     const section = sections.find((candidate) => candidate.name === name);
     if (!section) throw new Error(`The page has no content for its ${name} section`);
@@ -39,19 +38,9 @@ export function clearSections(root) {
   }
 }
 
-// Loads a page's sections with `load` and shows them in `root`. The visitor sees the whole page or
-// the unavailable block, never part of each. Resolves to whether the page is showing.
-export async function showPage({ root, load, imageUrl, report = console.error }) {
-  showState(root, 'loading');
-  try {
-    fillSections(root, await load(), { imageUrl });
-  } catch (error) {
-    clearSections(root);
-    // The page is put right before the report, so a reporter that fails cannot leave it loading.
-    showState(root, 'unavailable');
-    report('The ODIN page could not be shown.', error);
-    return false;
-  }
-  showState(root, 'ready');
-  return true;
+// Loads a page's sections with `load` and shows them in `root`: the whole page or the unavailable
+// block. Resolves to whether the page is showing.
+export function showPage({ root, load, imageUrl, report }) {
+  const fill = (page, sections) => fillSections(page, sections, { imageUrl });
+  return showContent({ root, load, report, fill, clear: clearSections });
 }

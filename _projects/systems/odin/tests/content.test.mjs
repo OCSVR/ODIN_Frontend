@@ -36,7 +36,7 @@ test('site() asks Flask for the site basics and returns them', async () => {
 });
 
 const SECTIONS = [
-  { name: 'hero', kicker: 'Introducing', title: 'Example', text: 'One line.', action: 'Contact Us!', image: 'hero.webp', image_alt: 'A lens.', items: [] },
+  { name: 'hero', kicker: 'Example kicker', title: 'Example', text: 'One line.', action: 'Example action', image: 'hero.webp', image_alt: 'A lens.', items: [] },
   { name: 'features', kicker: null, title: null, text: null, action: null, image: null, image_alt: null, items: [{ title: 'Quick', text: 'Fast.' }] },
 ];
 

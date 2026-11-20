@@ -1,5 +1,6 @@
-// The frame of the ODIN Diagnostics pages: header, menu and footer. Page content uses the shared
-// OCS grammar. Every color here is a theme variable, so the frame follows the visitor's theme.
+// The ODIN Diagnostics styles: the frame (header, menu and footer) and the few things a page needs
+// beyond the shared OCS grammar. Every color here is a theme variable, so the pages follow the
+// visitor's theme.
 
 $odin-width: 72rem;
 $odin-gutter: 1rem;
@@ -17,9 +18,12 @@ $odin-rule: 1px solid var(--ui-border);
     display: none;
   }
 
-  // Another project's stylesheet hides every h1 on the site. ODIN pages have one each.
+  // Other stylesheets on the site hide every h1 and give it a green glow. ODIN pages have one h1
+  // each, in the theme's text color.
   h1 {
     display: block;
+    color: var(--pref-text-color);
+    text-shadow: none;
   }
 }
 
@@ -164,21 +168,12 @@ $odin-rule: 1px solid var(--ui-border);
   padding: 1.5rem $odin-gutter 3rem;
 }
 
-// The home page's first screen: the words beside the photo, and above it on a phone
-.odin__hero {
-  display: grid;
-  gap: 2rem;
+// The home page's first screen. ocs__split puts the words beside the photo, and above it on a phone.
+.odin__hero.ocs__split {
   align-items: center;
-  padding: 1.5rem 0 3rem;
-
-  @media (min-width: $odin-phone) {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .odin__kicker {
-  margin: 0;
-  color: var(--text-muted);
   font-size: 1.25rem;
 }
 
@@ -188,9 +183,12 @@ $odin-rule: 1px solid var(--ui-border);
   line-height: 1.05;
 }
 
+// The shape is set here so the page does not jump when the photo arrives
 .odin__hero-image {
   width: 100%;
   height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
 }
 
 .odin__footer {
