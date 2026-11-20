@@ -121,6 +121,15 @@ test('the layout leaves the company\'s name out of the page title', () => {
   assert.ok(!layout.includes('site.title'), 'the layout prints the site title from _config.yml');
 });
 
+// Two pages with one address would leave it to chance which one the site shows.
+test('the ODIN home page is the only page at the site root', () => {
+  const home = readFileSync(new URL('pages/home.md', system), 'utf8');
+  assert.match(home, /^permalink: \/$/m, 'pages/home.md is not at the site root');
+  for (const name of ['index.md', 'index.html']) {
+    assert.ok(!existsSync(new URL(name, root)), `${name} at the repo root would also claim the site root`);
+  }
+});
+
 // The site is served under a base address (/ODIN_Frontend), so a link printed without it is broken.
 test('every link the header and footer print goes through relative_url', () => {
   for (const file of ['header.html', 'footer.html']) {

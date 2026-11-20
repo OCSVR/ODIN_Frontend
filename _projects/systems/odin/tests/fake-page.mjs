@@ -9,6 +9,8 @@ const DATASET_KEYS = {
   '[data-odin-state]': 'odinState',
   '[data-odin-field]': 'odinField',
   '[data-odin-href]': 'odinHref',
+  '[data-odin-section]': 'odinSection',
+  '[data-odin-image]': 'odinImage',
   '[data-odin-frame]': 'odinFrame',
   '[data-odin-logo]': 'odinLogo',
   '[data-odin-nav]': 'odinNav',

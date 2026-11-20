@@ -35,6 +35,48 @@ test('site() asks Flask for the site basics and returns them', async () => {
   assert.deepEqual(flask.paths, ['/api/odin/site']);
 });
 
+const SECTIONS = [
+  { name: 'hero', kicker: 'Introducing', title: 'Example', text: 'One line.', action: 'Contact Us!', image: 'hero.webp', image_alt: 'A lens.', items: [] },
+  { name: 'features', kicker: null, title: null, text: null, action: null, image: null, image_alt: null, items: [{ title: 'Quick', text: 'Fast.' }] },
+];
+
+test('page() asks Flask for one page by name and returns its sections in order', async () => {
+  const flask = fakeFlask({ page: 'home', sections: SECTIONS });
+  assert.deepEqual(await createContent(flask).page('home'), SECTIONS);
+  assert.deepEqual(flask.paths, ['/api/odin/page?name=home']);
+});
+
+test('page() writes the page name safely into the address', async () => {
+  const flask = fakeFlask({ page: 'x', sections: SECTIONS });
+  await createContent(flask).page('a b&c');
+  assert.deepEqual(flask.paths, ['/api/odin/page?name=a%20b%26c']);
+});
+
+test('page() is unavailable when the answer is not a list of named sections', async () => {
+  const answers = [null, 'home', [], {}, { sections: null }, { sections: [] }, { sections: 'hero' }, { sections: [null] }, { sections: [{ title: 'No name' }] }, { sections: [SECTIONS[0], { name: 5 }] }];
+  for (const answer of answers) {
+    await assert.rejects(createContent(fakeFlask(answer)).page('home'), (error) => {
+      assert.ok(error instanceof ContentUnavailableError, JSON.stringify(answer));
+      assert.match(error.message, /without a list of sections$/);
+      return true;
+    });
+  }
+});
+
+test('page() is unavailable when Flask has no such page (404), and keeps the reason', async () => {
+  const missing = new BackendError({ status: 404, method: 'GET', path: '/api/odin/page?name=home', body: { message: 'No ODIN page has that name.' } });
+  await assert.rejects(createContent(fakeFlask(missing)).page('home'), (error) => {
+    assert.ok(error instanceof ContentUnavailableError);
+    assert.equal(error.cause, missing);
+    return true;
+  });
+});
+
+test('page() is unavailable when Flask has not answered within the time limit', async () => {
+  const silent = { request: () => new Promise(() => {}) };
+  await assert.rejects(createContent(silent, { timeLimitMs: 5 }).page('home'), ContentUnavailableError);
+});
+
 test('imageUrl builds the address of an image from its file name', () => {
   const content = createContent(new Backend('http://localhost:8587', {}));
   assert.equal(content.imageUrl('logo-dark.svg'), 'http://localhost:8587/api/odin/image?name=logo-dark.svg');

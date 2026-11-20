@@ -2,6 +2,7 @@
 // and a page that gets no usable answer shows that the content is unavailable.
 
 const SITE_PATH = '/api/odin/site';
+const PAGE_PATH = '/api/odin/page';
 const IMAGE_PATH = '/api/odin/image';
 
 // The keys of the site basics, as GET /api/odin/site sends them.
@@ -28,13 +29,13 @@ export function createContent(flask, { timeLimitMs = DEFAULT_TIME_LIMIT_MS } = {
   return {
     // The site basics: the company name, how to reach it, its logos and the footer's lines.
     async site() {
-      let answer;
-      try {
-        answer = await withTimeLimit(flask.request(SITE_PATH), timeLimitMs);
-      } catch (cause) {
-        throw new ContentUnavailableError(`GET ${SITE_PATH} gave no content`, { cause });
-      }
-      return textRecord(answer, SITE_FIELDS, SITE_PATH);
+      return textRecord(await ask(SITE_PATH), SITE_FIELDS, SITE_PATH);
+    },
+
+    // One page's sections, in the order the page shows them. `name` is the page's name, such as home.
+    async page(name) {
+      const path = `${PAGE_PATH}?name=${encodeURIComponent(name)}`;
+      return sectionList(await ask(path), path);
     },
 
     // The address of one of the website's images, by the file name a record gives for it.
@@ -42,6 +43,26 @@ export function createContent(flask, { timeLimitMs = DEFAULT_TIME_LIMIT_MS } = {
       return `${flask.baseUrl}${IMAGE_PATH}?name=${encodeURIComponent(name)}`;
     },
   };
+
+  // Flask's answer to a GET of this path. A request that fails or takes too long is unavailable content.
+  async function ask(path) {
+    try {
+      return await withTimeLimit(flask.request(path), timeLimitMs);
+    } catch (cause) {
+      throw new ContentUnavailableError(`GET ${path} gave no content`, { cause });
+    }
+  }
+}
+
+// The sections in an answer: a list with at least one, each an object with a name. What a section
+// holds is checked where the page uses it, because sections differ.
+function sectionList(answer, path) {
+  const sections = answer !== null && typeof answer === 'object' ? answer.sections : undefined;
+  const named = (section) => section !== null && typeof section === 'object' && typeof section.name === 'string';
+  if (!Array.isArray(sections) || sections.length === 0 || !sections.every(named)) {
+    throw new ContentUnavailableError(`GET ${path} answered without a list of sections`);
+  }
+  return sections;
 }
 
 // The named fields of an answer, each of which must be text that is not blank. Anything else in the

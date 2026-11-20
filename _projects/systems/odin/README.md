@@ -5,8 +5,8 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 copies them to the paths Jekyll reads.
 
 So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, and one page that checks the
-connection. The site's own pages come in later tasks.
+scripts that read content from the backend, the home page with its hero, and one
+page that checks the connection. The rest of the site's pages come in later tasks.
 
 ## Content comes from the backend
 
@@ -43,12 +43,20 @@ start with `odin__`. Page content uses the shared OCS grammar.
   the ten site basics from `GET /api/odin/site`, such as `name`, `phone` and
   `logo_dark`. It throws `ContentUnavailableError` when Flask is down, takes
   longer than eight seconds, or answers without text for one of them.
+  `page(name)` returns the sections of one page from
+  `GET /api/odin/page?name=<name>`, in the order the page shows them.
   `imageUrl(name)` gives the address of an image by its file name.
 - `js/content-view.js` shows a record in the page. `showContent` shows one of
   three blocks marked `data-odin-state`: `loading`, `ready` or `unavailable`.
   It fills the marked elements: `data-odin-field` for text and `data-odin-href`
   for a link, which must be an https address. When the content cannot be loaded
   the visitor sees the unavailable block and no content.
+- `js/page-view.js` shows a page built from sections. `showPage` uses the same
+  three blocks. Each section's element is marked `data-odin-section="<name>"`,
+  and inside it `data-odin-field` takes a part's text (`kicker`, `title`, `text`,
+  `action`), `data-odin-href="link"` the section's link and `data-odin-image` its
+  image with its description. A part the markup asks for must be in the section,
+  or the whole page is unavailable.
 - `js/site-frame.js` runs the header and footer: `startFrame` starts the phone
   menu, fills the parts marked `data-odin-frame` and picks the logos.
 
@@ -78,6 +86,9 @@ edit the sources here.
 | `_includes/` | `_includes/projects/odin/` |
 | `js/` | `assets/js/projects/odin/` |
 | `sass/main.scss` | `_sass/projects/odin/main.scss` |
+
+`pages/home.md` is the home page, at the site root. It took the place of the
+template's placeholder `index.md`, so keep the root free of another index page.
 
 `pages/connection.md` is the connection check. Its permalink is
 `/odin/connection/`, which `baseurl` puts at `/ODIN_Frontend/odin/connection/`.
