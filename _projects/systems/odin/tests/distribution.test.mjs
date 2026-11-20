@@ -170,6 +170,20 @@ test('the pages and the contact block name only parts the backend sends', () => 
   }
 });
 
+// A menu entry with no page behind it is a dead link on every page of the site.
+test('every page in the ODIN menus exists, at the address the menu gives', () => {
+  const config = readFileSync(new URL('_config.yml', root), 'utf8');
+  const block = config.slice(config.indexOf('\nodin:\n'));
+  const menu = [...block.matchAll(/^\s+- \{ title: "([^"]+)", url: "([^"]+)" \}$/gm)].map(([, title, url]) => ({ title, url }));
+  const permalinks = readdirSync(new URL('pages/', system))
+    .map((name) => readFileSync(new URL(`pages/${name}`, system), 'utf8').match(/^permalink: (\S+)$/m)?.[1]);
+  // The About page is the next task. Until it lands, its menu entries are the only ones excused.
+  const pending = ['/about/'];
+  for (const { title, url } of menu) {
+    assert.ok(permalinks.includes(url) || pending.includes(url), `the menu entry ${title} leads to ${url}, which no ODIN page has`);
+  }
+});
+
 // The hero's button jumps to the contact block, which the home page includes.
 test('the home page includes the contact block that its button leads to', () => {
   const home = readFileSync(new URL('pages/home.md', system), 'utf8');

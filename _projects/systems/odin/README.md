@@ -5,9 +5,9 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 copies them to the paths Jekyll reads.
 
 So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, the home page with its contact block,
-and one page that checks the connection. The About and Contact Us pages come in
-later tasks. Contact Us will include the same block.
+scripts that read content from the backend, the home page, the Contact Us page,
+the contact block those two share, and one page that checks the connection. The
+About page comes in a later task.
 
 ## Content comes from the backend
 
@@ -115,7 +115,11 @@ edit the sources here.
 | `sass/main.scss` | `_sass/projects/odin/main.scss` |
 
 `_includes/contact.html` is the contact block. A page that includes it loads the
-backend's `contact` page and the site basics, as `pages/home.md` does.
+backend's `contact` page and the site basics, as `pages/home.md` and
+`pages/contact.md` do.
+
+`pages/contact.md` is the Contact Us page, at `/contact/`: the page's title and
+the line under it, then the contact block.
 
 `pages/home.md` is the home page, at the site root. It took the place of the
 template's placeholder `index.md`, so keep the root free of another index page.
@@ -136,7 +140,8 @@ node --test _projects/systems/odin/tests/*.test.mjs
 ```
 
 To check the pages in a browser, start Flask on port 8587 and the site with
-`make`. The home page is at `http://localhost:4500/ODIN_Frontend/` and the
-connection check at `http://localhost:4500/ODIN_Frontend/odin/connection/`.
+`make`. The home page is at `http://localhost:4500/ODIN_Frontend/`, Contact Us
+at `http://localhost:4500/ODIN_Frontend/contact/` and the connection check at
+`http://localhost:4500/ODIN_Frontend/odin/connection/`.
 Stop Flask and
 reload to see the unavailable message.
