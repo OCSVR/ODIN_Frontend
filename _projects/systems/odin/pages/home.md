@@ -1,5 +1,6 @@
 ---
 layout: projects/odin/site
+full_width: true
 title: Home
 permalink: /
 ---
@@ -16,67 +17,77 @@ permalink: /
     </div>
   </div>
   <div data-odin-state="ready" hidden>
-    <div class="ocs__stack ocs__stack--wide">
-      <section class="ocs__split odin__hero" data-odin-section="hero">
+    <section class="ocs__card" data-odin-section="hero">
+      <div class="ocs__split odin__row">
         <div>
-          <p class="ocs__text odin__kicker" data-odin-field="kicker"></p>
-          <h1 class="odin__hero-title" data-odin-field="title"></h1>
+          <span class="ocs__badge" data-odin-field="kicker"></span>
+          <h1 class="odin__title" data-odin-field="title"></h1>
           <p class="ocs__lead" data-odin-field="text"></p>
-          <a class="ocs__btn medium accent fill" href="#contact" data-odin-field="action"></a>
+          <div class="ocs__links">
+            <a class="ocs__btn large pill accent fill" href="#contact" data-odin-field="action"></a>
+          </div>
         </div>
-        <div>
-          <img class="odin__hero-image" data-odin-image alt="">
+        <div class="ocs__image-frame ocs__image-frame--cover odin__photo">
+          <img data-odin-image alt="">
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section data-odin-section="statistics">
-        <h2 class="ocs__section-title" data-odin-field="title"></h2>
-        <div class="ocs__stats" data-odin-items>
+    <section class="ocs__card" data-odin-section="statistics">
+      <h2 class="ocs__section-title" data-odin-field="title"></h2>
+      <div class="ocs__stats odin__stats" data-odin-items>
+        <template>
+          <div class="ocs__stat">
+            <span class="ocs__stat-value" data-odin-field="title"></span>
+            <span class="ocs__stat-label" data-odin-field="text"></span>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <section class="ocs__card" data-odin-section="features">
+      <div class="ocs__split odin__row">
+        <div class="ocs__image-frame ocs__image-frame--cover odin__photo odin__photo--product">
+          <img data-odin-image alt="">
+        </div>
+        <div class="ocs__keypoints" data-odin-items>
           <template>
-            <div class="ocs__stat">
-              <strong class="ocs__stat-value" data-odin-field="title"></strong>
-              <p class="ocs__text" data-odin-field="text"></p>
+            <div class="ocs__keypoint">
+              <span class="ocs__check" aria-hidden="true">&#10003;</span>
+              <div>
+                <strong data-odin-field="title"></strong>
+                <p class="ocs__text" data-odin-field="text"></p>
+              </div>
             </div>
           </template>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="ocs__split" data-odin-section="features">
-        <div class="ocs__stack" data-odin-items>
-          <template>
-            <div>
-              <h3 data-odin-field="title"></h3>
-              <p class="ocs__text" data-odin-field="text"></p>
-            </div>
-          </template>
-        </div>
+    <section class="ocs__card" data-odin-section="how_it_works">
+      <div class="ocs__split odin__row">
         <div>
-          <img class="ocs__image-frame" data-odin-image alt="">
-        </div>
-      </section>
-
-      <section class="ocs__split" data-odin-section="how_it_works">
-        <div class="ocs__stack">
-          <h2 class="ocs__section-title" data-odin-field="title"></h2>
+          <h2 class="odin__heading" data-odin-field="title"></h2>
           <p class="ocs__lead" data-odin-field="text"></p>
         </div>
-        <div>
-          <img class="ocs__image-frame" data-odin-image alt="">
+        <div class="ocs__image-frame ocs__image-frame--cover odin__photo odin__photo--strip">
+          <img data-odin-image alt="">
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="ocs__stack" data-odin-section="pitch">
-        <h2 class="ocs__section-title" data-odin-field="title"></h2>
+    <div class="ocs__card">
+      <section data-odin-section="pitch">
+        <h2 class="odin__heading" data-odin-field="title"></h2>
         <p class="ocs__lead" data-odin-field="text"></p>
       </section>
-
       <section class="ocs__callout" data-odin-section="fda">
         <h2 class="ocs__section-title" data-odin-field="title"></h2>
         <p class="ocs__text" data-odin-field="text"></p>
       </section>
-
-      {% include projects/odin/contact.html %}
     </div>
+
+    {% include projects/odin/contact.html %}
   </div>
   <noscript>
     <p class="ocs__callout">This page needs JavaScript to load its content.</p>

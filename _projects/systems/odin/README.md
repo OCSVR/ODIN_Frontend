@@ -22,7 +22,10 @@ and error messages.
 A page uses the layout with `layout: projects/odin/site`. That layout is built
 on the shared OCS layout, `opencs`, so an ODIN page has the same frame as every
 OCS page: the OCS head, the top bar with the site menu and Login, and the page
-column. The ODIN layout adds only the footer and the script that fills it.
+column. The ODIN layout adds only the footer and the script that fills it. The
+three site pages set `full_width: true`, which the shared layout turns into a
+page as wide as the window, and `sass/main.scss` keeps the content to a readable
+width inside it.
 
 The site menu is the OCS one: `minima.nav_pages` in `_config.yml` lists the ODIN
 pages by their published paths, in menu order, and the top bar shows each page's
@@ -43,10 +46,18 @@ picked again if the theme is applied or changed after the page has loaded.
 A page's main heading is an `h1`. Another project's stylesheet hides every `h1`
 on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
+Pages are built from the shared OCS grammar in `_sass/open-coding/elements`:
+each block is an `ocs__card`, with `ocs__badge`, `ocs__lead` and
+`ocs__section-title` for its words, `ocs__split` and `ocs__visual` for two
+panels side by side, `ocs__stat`, `ocs__keypoints` and `ocs__team` for numbers,
+points and labelled values, and `ocs__image-frame` for photos. Reach for one of
+these before writing a style.
+
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
-start with `odin__`. Page content uses the shared OCS grammar. The pages add a
-few `odin__` classes where the grammar has none: the hero's sizes, text with line
-breaks in it and the partner logo.
+start with `odin__`. It holds only what the frame and the grammar lack: the
+page's width, the size of a page's main heading and of a section heading that is
+a sentence, the shapes of the photos, four numbers in one row, the logo's size,
+text with line breaks in it and the partner logo.
 
 ## The scripts
 
@@ -132,10 +143,11 @@ edit the sources here.
 backend's `contact` page and the site basics, as `pages/home.md` and
 `pages/contact.md` do.
 
-`pages/about.md` is the About page, at `/about/`: the title and the mission. It
-took the place of the template's own `navigation/about.md`, which was removed
-with its photos in `images/about/` and its `nav_pages` entry in `_config.yml`.
-Keep that file from coming back, or two pages claim `/about/`.
+`pages/about.md` is the About page, at `/about/`: the title and the mission, with
+a photo beside it. It took the place of the template's own
+`navigation/about.md`, which was removed with its photos in `images/about/` and
+its `nav_pages` entry in `_config.yml`. Keep that file from coming back, or two
+pages claim `/about/`.
 
 `pages/contact.md` is the Contact Us page, at `/contact/`: the page's title and
 the line under it, then the contact block.

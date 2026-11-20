@@ -1,8 +1,12 @@
-// The ODIN Diagnostics styles. The pages sit in the shared OCS frame, so this file holds only the
-// few things a page needs beyond the shared OCS grammar. Every color here is a theme variable, so
-// the pages follow the visitor's theme.
+// The ODIN Diagnostics styles. The pages sit in the OCS frame and are built from the shared OCS
+// grammar, so this file holds only the few things those lack. Every color here is a theme
+// variable, so the pages follow the visitor's theme.
 
 .odin {
+  // The shared layout gives a wide page the full window. This keeps ODIN's lines a readable length.
+  max-width: 70rem;
+  margin: 0 auto;
+
   // A part waiting for the backend is marked hidden. Without this, a class that sets display
   // would show it anyway.
   [hidden] {
@@ -28,6 +32,63 @@
     display: block;
     overflow-wrap: anywhere;
   }
+
+  // ocs__split leaves a gap above itself for the text it usually follows. One that opens a card
+  // has the card's own padding there.
+  .ocs__card > .ocs__split:first-child {
+    margin-top: 0;
+  }
+}
+
+// A page's main heading, large enough to lead the page
+.odin__title {
+  margin: 0 0 1rem;
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+// A section's heading where it is a sentence of its own, larger than ocs__section-title's label
+.odin__heading {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  line-height: 1.2;
+}
+
+// Words beside a photo sit level with its middle
+.ocs__split.odin__row {
+  align-items: center;
+}
+
+// A photo's shape is set here, so the page does not jump when the photo arrives
+.odin__photo {
+  aspect-ratio: 3 / 2;
+
+  &--product {
+    aspect-ratio: 4 / 3;
+  }
+
+  &--strip {
+    aspect-ratio: 13 / 6;
+  }
+
+  &--square {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+// Four numbers in a row on a wide screen, two on a narrower one. On a phone ocs__stats already
+// puts them in one column.
+@media (min-width: 521px) {
+  .ocs__stats.odin__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 62rem) {
+  .ocs__stats.odin__stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 // ODIN's logo is a wide wordmark, so it is sized by its height
@@ -40,30 +101,7 @@
   border-radius: 0;
 }
 
-// The home page's first screen. ocs__split puts the words beside the photo, and above it on a phone.
-.odin__hero.ocs__split {
-  align-items: center;
-}
-
-.odin__kicker {
-  font-size: 1.25rem;
-}
-
-.odin__hero-title {
-  margin: 0 0 0.75rem;
-  font-size: 3.5rem;
-  line-height: 1.05;
-}
-
-// The shape is set here so the page does not jump when the photo arrives
-.odin__hero-image {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-}
-
-// Text the backend sends with line breaks in it: paragraphs, or two degrees on two lines
+// Text the backend sends with line breaks in it
 .odin__lines {
   white-space: pre-line;
 }
@@ -71,9 +109,11 @@
 // The partner's logo is white on a clear background, so a light theme would hide it. The script
 // says whether what is behind it is light, and then the logo is turned dark.
 .odin__partner {
+  display: block;
   width: 100%;
   max-width: 14rem;
   height: auto;
+  margin: 0 auto;
   aspect-ratio: 1 / 1;
 
   &[data-odin-backdrop="light"] {

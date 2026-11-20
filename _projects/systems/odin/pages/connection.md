@@ -9,9 +9,11 @@ search_exclude: true
 
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable -->
-<div class="ocs__container">
-  <h1 class="ocs__section-title">{{ page.title | escape }}</h1>
-  <p class="ocs__description">This page asks the Flask backend for the site basics and shows what comes back. It is for the team, to confirm that the two repositories are connected.</p>
+<div class="ocs__container ocs__container--fill">
+  <div class="ocs__card">
+    <h1 class="ocs__section-title">{{ page.title | escape }}</h1>
+    <p class="ocs__lead">This page asks the Flask backend for the site basics and shows what comes back. It is for the team, to confirm that the two repositories are connected.</p>
+  </div>
   <div class="ocs__card" data-odin-site role="status">
     <div data-odin-state="loading">
       <p class="ocs__text">Loading the site content.</p>

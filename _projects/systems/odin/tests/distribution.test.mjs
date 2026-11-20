@@ -94,6 +94,13 @@ test('the odin layout is built on the shared OCS layout, and adds no top bar of 
   }
 });
 
+// The shared layout keeps a page in a narrow column unless the page asks for the full width.
+test('the three site pages ask the shared layout for the full width', () => {
+  for (const name of ['home.md', 'about.md', 'contact.md']) {
+    assert.match(readFileSync(new URL(`pages/${name}`, system), 'utf8'), /^full_width: true$/m, `${name} does not ask for the full width`);
+  }
+});
+
 // The site menu is the OCS one: minima.nav_pages in _config.yml, which the shared top bar loops
 // over. Each entry is the published path of a page, so one that names no ODIN page is left out of
 // the bar without a word.

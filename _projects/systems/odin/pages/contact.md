@@ -1,5 +1,6 @@
 ---
 layout: projects/odin/site
+full_width: true
 title: Contact Us
 permalink: /contact/
 ---
@@ -16,14 +17,12 @@ permalink: /contact/
     </div>
   </div>
   <div data-odin-state="ready" hidden>
-    <div class="ocs__stack ocs__stack--wide">
-      <section data-odin-section="intro">
-        <h1 data-odin-field="title"></h1>
-        <p class="ocs__lead" data-odin-field="text"></p>
-      </section>
+    <section class="ocs__card" data-odin-section="intro">
+      <h1 class="odin__title" data-odin-field="title"></h1>
+      <p class="ocs__lead" data-odin-field="text"></p>
+    </section>
 
-      {% include projects/odin/contact.html %}
-    </div>
+    {% include projects/odin/contact.html %}
   </div>
   <noscript>
     <p class="ocs__callout">This page needs JavaScript to load its content.</p>

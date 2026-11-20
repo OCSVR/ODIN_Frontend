@@ -1,5 +1,6 @@
 ---
 layout: projects/odin/site
+full_width: true
 title: About
 permalink: /about/
 ---
@@ -16,13 +17,15 @@ permalink: /about/
     </div>
   </div>
   <div data-odin-state="ready" hidden>
-    <div class="ocs__stack ocs__stack--wide">
+    <div class="ocs__card">
       <section data-odin-section="intro">
-        <h1 data-odin-field="title"></h1>
+        <h1 class="odin__title" data-odin-field="title"></h1>
       </section>
-
-      <section data-odin-section="mission">
+      <section class="ocs__split" data-odin-section="mission">
         <p class="ocs__lead odin__lines" data-odin-field="text"></p>
+        <div class="ocs__image-frame ocs__image-frame--cover odin__photo odin__photo--square">
+          <img data-odin-image alt="">
+        </div>
       </section>
     </div>
   </div>
