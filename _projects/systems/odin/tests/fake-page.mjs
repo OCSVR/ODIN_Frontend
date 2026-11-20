@@ -1,6 +1,6 @@
 // A small stand-in for the browser DOM, enough for the odin modules to run under Node, which has
-// no DOM (and this repo has no npm, so no jsdom). An element keeps its dataset, attributes, text
-// and listeners. A container finds its children by the data attributes the modules use. Matches
+// no DOM (and this repo has no npm, so no jsdom). An element keeps its dataset, attributes and
+// text. A container finds its children by the data attributes the modules use. Matches
 // come back as a Set because, like a browser's NodeList, it can be looped over but has no array
 // methods. A selector the fake does not know throws, so a module that starts using a new one fails
 // here instead of matching nothing.
@@ -16,27 +16,20 @@ const DATASET_KEYS = {
   '[data-odin-backdrop]': 'odinBackdrop',
   '[data-odin-frame]': 'odinFrame',
   '[data-odin-logo]': 'odinLogo',
-  '[data-odin-nav]': 'odinNav',
-  '[data-odin-menu-toggle]': 'odinMenuToggle',
 };
 
 export function element(dataset = {}, { hidden = false, parentElement = null } = {}) {
   const attributes = new Map();
-  const listeners = new Map();
   return {
     dataset,
     hidden,
     parentElement,
     textContent: '',
-    focused: false,
     removed: false,
     remove() { this.removed = true; },
     setAttribute(name, value) { attributes.set(name, String(value)); },
     getAttribute(name) { return attributes.has(name) ? attributes.get(name) : null; },
     removeAttribute(name) { attributes.delete(name); },
-    addEventListener(type, handler) { listeners.set(type, [...(listeners.get(type) || []), handler]); },
-    fire(type, event = {}) { for (const handler of listeners.get(type) || []) handler(event); },
-    focus() { this.focused = true; },
   };
 }
 

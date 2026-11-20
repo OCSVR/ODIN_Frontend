@@ -4,8 +4,8 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 [Login](../login/README.md): the sources live in this folder, and `make`
 copies them to the paths Jekyll reads.
 
-So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, the three pages of the site (home,
+So far it has the layout every ODIN page uses (the shared OCS frame with ODIN's
+footer), the scripts that read content from the backend, the three pages of the site (home,
 About and Contact Us), the contact block that home and Contact Us share, and one
 page that checks the connection.
 
@@ -14,26 +14,31 @@ page that checks the connection.
 The website's text, numbers and images belong in the Flask backend, and pages
 load them from its API. Keep them out of this folder. Three kinds of words do
 live here: the menus in `_config.yml`, each page's `title` in its front matter
-(the browser tab's label, the same word as its menu entry), and the loading and
-error messages.
+(the browser tab's label and the page's entry in the top bar), and the loading
+and error messages.
 
 ## The layout and the menus
 
-A page uses the layout with `layout: projects/odin/site`. The layout has its own
-small head (the site stylesheet, the theme fonts and `user-preferences.js`) and
-none of the OCS navbar, sign-in or analytics.
+A page uses the layout with `layout: projects/odin/site`. That layout is built
+on the shared OCS layout, `opencs`, so an ODIN page has the same frame as every
+OCS page: the OCS head, the top bar with the site menu and Login, and the page
+column. The ODIN layout adds only the footer and the script that fills it.
 
-The menus are lists under `odin:` in `_config.yml`: `nav` for the header, and
-`social` and `footer_nav` for the footer. `_includes/header.html` and
-`_includes/footer.html` only loop over them, so adding a page to a menu is one
-line of config. The menus show even when the backend is down.
+The site menu is the OCS one: `minima.nav_pages` in `_config.yml` lists the ODIN
+pages by their published paths, in menu order, and the top bar shows each page's
+`title`. Sign-in is the shared Login page at `/login`, which signs in to the
+same Flask backend the content comes from. The footer's two lists are under
+`odin:` in `_config.yml`: `footer_nav` and `social`. `_includes/footer.html`
+only loops over them. The menus show even when the backend is down.
 
-The logo, tagline, social link addresses and copyright line come from the site
-basics. Each part that shows them is marked `data-odin-frame` and stays hidden
-until `js/site-frame.js` has filled it. The company's name is added to the page
-title the same way. The logo suits the background it sits on: the light logo on
-a dark one and the dark logo on a light one. It is picked again if the theme is
-applied or changed after the page has loaded.
+The browser tab's title is the page's `title` and the site's `title` from
+`_config.yml`, written by the shared head.
+
+The footer's logo, tagline, social link addresses and copyright line come from
+the site basics. Each part that shows them is marked `data-odin-frame` and stays
+hidden until `js/site-frame.js` has filled it. The logo suits the background it
+sits on: the light logo on a dark one and the dark logo on a light one. It is
+picked again if the theme is applied or changed after the page has loaded.
 
 A page's main heading is an `h1`. Another project's stylesheet hides every `h1`
 on the site, and `sass/main.scss` shows them again inside the ODIN layout.
@@ -85,8 +90,8 @@ breaks in it and the partner logo.
   page is unavailable. Do not nest one section's element in another's: a section
   fills every mark inside its element. A page can show sections of more than one
   backend page, as long as no two have the same name.
-- `js/site-frame.js` runs the header and footer: `startFrame` starts the phone
-  menu, fills the parts marked `data-odin-frame` and picks the logos. It also
+- `js/site-frame.js` runs the footer: `startFrame` fills the parts marked
+  `data-odin-frame` and picks the logos. It also
   tells any element marked `data-odin-backdrop` whether what is behind it is
   `dark` or `light`, which the styles use to turn the white partner logo dark on
   a light theme.

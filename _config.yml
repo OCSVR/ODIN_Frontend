@@ -28,10 +28,6 @@ spring: false
 # The ODIN Diagnostics website's menus, drawn by the header and footer in _projects/systems/odin/_includes.
 # To add a page to a menu, add a line here: no HTML changes.
 odin:
-  nav:
-    - { title: "Home", url: "/" }
-    - { title: "About", url: "/about/" }
-    - { title: "Contact Us", url: "/contact/" }
   # The footer's social links. The backend gives the address for each, in the field named here.
   social:
     - { title: "Instagram", field: "instagram" }
@@ -130,4 +126,6 @@ minima:
     - { platform: x, user_url: "https://x.com/Open_Coding" }
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
-    - navigation/projects/topics/topics.md
+    - navigation/projects/odin/home.md
+    - navigation/projects/odin/about.md
+    - navigation/projects/odin/contact.md

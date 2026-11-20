@@ -69,35 +69,62 @@ test('each folder is published where the site looks for it', () => {
 });
 
 // The layout and its pages name each other by these paths, so a rename breaks the build.
-test('every page uses the odin layout, and the layout includes the header and footer that exist', () => {
+test('every page uses the odin layout, and the layout includes the footer that exists', () => {
   for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
     assert.match(readFileSync(new URL(`pages/${name}`, system), 'utf8'), /^layout: projects\/odin\/site$/m, `${name} does not use the odin layout`);
   }
   const layout = readFileSync(new URL('layouts/site.html', system), 'utf8');
-  for (const [, file] of layout.matchAll(/\{%-? include projects\/odin\/([\w.-]+) -?%\}/g)) {
+  const includes = [...layout.matchAll(/\{%-? include projects\/odin\/([\w.-]+) -?%\}/g)].map(([, file]) => file);
+  for (const file of includes) {
     assert.ok(existsSync(new URL(`_includes/${file}`, system)), `the layout includes ${file}, which is not in _includes/`);
   }
-  assert.match(layout, /include projects\/odin\/header\.html/);
-  assert.match(layout, /include projects\/odin\/footer\.html/);
+  assert.deepEqual(includes, ['footer.html']);
 });
 
-// The menus are lists in _config.yml, so adding a page never means editing HTML.
-test('the menus come from _config.yml, and the header and footer only loop over them', () => {
+// The ODIN layout sits inside the shared OCS layout, which gives every page the OCS head, the top
+// bar with the site menu and sign-in, and the page column. A top bar of ODIN's own would be a
+// second frame to keep up.
+test('the odin layout is built on the shared OCS layout, and adds no top bar of its own', () => {
+  const layout = readFileSync(new URL('layouts/site.html', system), 'utf8');
+  const [, parent] = layout.match(/^---\nlayout: ([\w/-]+)\n---\n/) || [];
+  assert.equal(parent, 'opencs');
+  assert.ok(existsSync(new URL(`_layouts/${parent}.html`, root)), `the shared layout ${parent} is not in _layouts/`);
+  for (const tag of ['<html', '<head', '<body', '<header', '<main']) {
+    assert.ok(!layout.includes(tag), `the odin layout writes its own ${tag}> where the shared layout already has one`);
+  }
+});
+
+// The site menu is the OCS one: minima.nav_pages in _config.yml, which the shared top bar loops
+// over. Each entry is the published path of a page, so one that names no ODIN page is left out of
+// the bar without a word.
+test('the site menu in _config.yml lists ODIN pages that exist, with the home page first', () => {
+  const config = readFileSync(new URL('_config.yml', root), 'utf8');
+  const [, list] = config.match(/\n  nav_pages:\n((?:    - \S+\n)+)/) || [];
+  assert.ok(list, '_config.yml has no minima.nav_pages list');
+  const paths = list.trim().split('\n').map((line) => line.replace(/^\s*- /, ''));
+  const pagesFolder = distribution().find(({ source }) => source === 'pages').destination;
+  for (const path of paths) {
+    assert.ok(path.startsWith(`${pagesFolder}/`), `the menu entry ${path} is not an ODIN page`);
+    const source = new URL(`pages/${path.slice(pagesFolder.length + 1)}`, system);
+    assert.ok(existsSync(source), `the menu entry ${path} has no page in pages/`);
+    assert.match(readFileSync(source, 'utf8'), /^title: \S/m, `${path} has no title for the menu to show`);
+  }
+  assert.equal(paths[0], `${pagesFolder}/home.md`);
+  assert.ok(paths.length >= 2, 'the site menu lists fewer than two pages');
+});
+
+// The footer's menu is a list in _config.yml too, so adding a page never means editing HTML.
+test('the footer menu comes from _config.yml, and the footer only loops over it', () => {
   const config = readFileSync(new URL('_config.yml', root), 'utf8');
   const block = config.slice(config.indexOf('\nodin:\n'));
   assert.ok(block.startsWith('\nodin:\n'), '_config.yml has no odin block');
   const items = [...block.matchAll(/^\s+- \{ title: "([^"]+)", url: "([^"]+)" \}$/gm)].map(([, title, url]) => ({ title, url }));
-  assert.ok(items.length >= 2, 'the odin menus list fewer than two pages');
+  assert.ok(items.length >= 1, 'the footer menu lists no page');
   for (const { title, url } of items) assert.match(url, /^\/([\w-]+\/)*$/, `${title} has the address ${url}`);
 
-  const header = readFileSync(new URL('_includes/header.html', system), 'utf8');
   const footer = readFileSync(new URL('_includes/footer.html', system), 'utf8');
-  assert.match(header, /for item in site\.odin\.nav/);
   assert.match(footer, /for item in site\.odin\.footer_nav\.items/);
-  for (const { title } of items) {
-    assert.ok(!header.includes(`>${title}<`), `the header writes the menu item ${title} itself`);
-    assert.ok(!footer.includes(`>${title}<`), `the footer writes the menu item ${title} itself`);
-  }
+  for (const { title } of items) assert.ok(!footer.includes(`>${title}<`), `the footer writes the menu item ${title} itself`);
 });
 
 // A social link whose field the backend does not send would keep the whole footer part hidden.
@@ -112,13 +139,6 @@ test('the footer\'s social links come from _config.yml, each naming a field the 
   assert.match(footer, /for item in site\.odin\.social/);
   assert.match(footer, /data-odin-href="\{\{ item\.field \}\}"/);
   for (const { title } of links) assert.ok(!footer.includes(`>${title}<`), `the footer writes the social link ${title} itself`);
-});
-
-// The company's name is content. The script adds it to the title once the backend has sent it.
-test('the layout leaves the company\'s name out of the page title', () => {
-  const layout = readFileSync(new URL('layouts/site.html', system), 'utf8');
-  assert.match(layout, /<title>\{\{ page\.title \| escape \}\}<\/title>/);
-  assert.ok(!layout.includes('site.title'), 'the layout prints the site title from _config.yml');
 });
 
 // Two pages with one address would leave it to chance which one the site shows.
@@ -178,14 +198,14 @@ test('the pages and the contact block name only parts the backend sends', () => 
 });
 
 // A menu entry with no page behind it is a dead link on every page of the site.
-test('every page in the ODIN menus exists, at the address the menu gives', () => {
+test('every page in the footer menu exists, at the address the menu gives', () => {
   const config = readFileSync(new URL('_config.yml', root), 'utf8');
   const block = config.slice(config.indexOf('\nodin:\n'));
   const menu = [...block.matchAll(/^\s+- \{ title: "([^"]+)", url: "([^"]+)" \}$/gm)].map(([, title, url]) => ({ title, url }));
   const permalinks = readdirSync(new URL('pages/', system))
     .map((name) => readFileSync(new URL(`pages/${name}`, system), 'utf8').match(/^permalink: (\S+)$/m)?.[1]);
-  // Every entry of the two menus must be one this test could read, or a dead link written another
-  // way would pass. The social links are entries too, with a field in place of an address.
+  // Every entry of the menu must be one this test could read, or a dead link written another way
+  // would pass. The social links are entries too, with a field in place of an address.
   const entries = block.slice(0, block.indexOf('\n\n')).split('\n').filter((line) => /^\s+- /.test(line));
   const social = entries.filter((line) => /field: /.test(line));
   assert.equal(menu.length, entries.length - social.length, 'a menu entry is written in a form this test cannot read');
@@ -224,8 +244,8 @@ test('the home page includes the contact block that its button leads to', () => 
 });
 
 // The site is served under a base address (/ODIN_Frontend), so a link printed without it is broken.
-test('every link the header and footer print goes through relative_url', () => {
-  for (const file of ['header.html', 'footer.html']) {
+test('every link the footer prints goes through relative_url', () => {
+  for (const file of ['footer.html']) {
     const markup = readFileSync(new URL(`_includes/${file}`, system), 'utf8');
     // \s keeps data-odin-href out: that one names a field, and the script fills in its address
     const links = [...markup.matchAll(/\shref="([^"]*)"/g)].map(([, address]) => address);

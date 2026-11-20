@@ -1,17 +1,8 @@
-// The ODIN Diagnostics styles: the frame (header, menu and footer) and the few things a page needs
-// beyond the shared OCS grammar. Every color here is a theme variable, so the pages follow the
-// visitor's theme.
-
-$odin-width: 72rem;
-$odin-gutter: 1rem;
-$odin-phone: 768px;
-$odin-rule: 1px solid var(--ui-border);
+// The ODIN Diagnostics styles. The pages sit in the shared OCS frame, so this file holds only the
+// few things a page needs beyond the shared OCS grammar. Every color here is a theme variable, so
+// the pages follow the visitor's theme.
 
 .odin {
-  margin: 0;
-  // The visitor's chosen font, as the OCS containers use. The site's own default is a code font.
-  font-family: var(--pref-font-family);
-
   // A part waiting for the backend is marked hidden. Without this, a class that sets display
   // would show it anyway.
   [hidden] {
@@ -39,145 +30,14 @@ $odin-rule: 1px solid var(--ui-border);
   }
 }
 
-// Off screen until a keyboard user tabs to it
-.odin__skip {
-  position: absolute;
-  top: 0.5rem;
-  left: -100rem;
-  padding: 0.5rem 0.75rem;
-  border: $odin-rule;
-  border-radius: 0.5rem;
-  background: var(--panel);
-  color: var(--pref-text-color);
-
-  &:focus {
-    left: 0.5rem;
-    z-index: 10;
-  }
-}
-
-// No background of its own, so it sits on the page's color in every theme. The phone menu is
-// placed against it.
-.odin__header {
-  position: relative;
-  border-bottom: $odin-rule;
-}
-
-.odin__bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  max-width: $odin-width;
-  margin: 0 auto;
-  padding: 0.75rem $odin-gutter;
-}
-
-.odin__brand {
-  display: inline-flex;
-  align-items: center;
-}
-
+// ODIN's logo is a wide wordmark, so it is sized by its height
 .odin__logo {
   display: block;
   width: auto;
   max-width: 100%;
-  height: 2.25rem;
+  height: 1.5rem;
   // The site rounds every image's corners, which would cut into the logo
   border-radius: 0;
-
-  &--small {
-    height: 1.5rem;
-  }
-}
-
-.odin__nav {
-  margin-left: auto;
-}
-
-.odin__menu {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.75rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.odin__menu-link {
-  display: inline-block;
-  padding: 0.5rem 0;
-  color: var(--pref-text-color);
-  font-family: inherit;
-  text-decoration: none;
-  text-underline-offset: 0.4em;
-
-  &:visited {
-    color: var(--pref-text-color);
-  }
-
-  &:hover,
-  &:focus-visible {
-    text-decoration: underline;
-    text-decoration-color: var(--pref-accent-color);
-    text-decoration-thickness: 2px;
-  }
-
-  &[aria-current="page"] {
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: var(--pref-accent-color);
-    text-decoration-thickness: 2px;
-  }
-}
-
-// The button only matters at phone width, and only once the script has made the menu collapsible.
-// The nav is named so this outranks the display that ocs__btn sets.
-.odin__nav .odin__menu-toggle {
-  display: none;
-}
-
-@media (max-width: $odin-phone) {
-  // Small enough that the logo and the menu button share one row
-  .odin__logo {
-    height: 1.5rem;
-  }
-
-  .odin__nav[data-odin-menu] {
-    .odin__menu-toggle:not([hidden]) {
-      display: inline-flex;
-    }
-
-    // The list drops down over the page, so the button stays where it was tapped
-    .odin__menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      left: 0;
-      z-index: 5;
-      flex-direction: column;
-      gap: 0;
-      padding: 0.25rem $odin-gutter 0.75rem;
-      border-bottom: $odin-rule;
-      background: var(--panel);
-    }
-  }
-
-  .odin__nav[data-odin-menu="closed"] .odin__menu {
-    display: none;
-  }
-}
-
-// The site lays the body out as a column, where side margins set to auto would let this shrink to
-// its text. Full width keeps it steady while content loads, and growing keeps the footer down.
-.odin__main {
-  flex: 1 0 auto;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: $odin-width;
-  margin: 0 auto;
-  padding: 1.5rem $odin-gutter 3rem;
 }
 
 // The home page's first screen. ocs__split puts the words beside the photo, and above it on a phone.
@@ -219,60 +79,4 @@ $odin-rule: 1px solid var(--ui-border);
   &[data-odin-backdrop="light"] {
     filter: invert(1);
   }
-}
-
-.odin__footer {
-  border-top: $odin-rule;
-  background: var(--panel);
-  color: var(--pref-text-color);
-}
-
-.odin__footer-columns {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  max-width: $odin-width;
-  margin: 0 auto;
-  padding: 2.5rem $odin-gutter 1.5rem;
-
-  @media (max-width: $odin-phone) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.odin__footer-brand {
-  display: grid;
-  gap: 0.75rem;
-  justify-items: start;
-  max-width: 24rem;
-}
-
-.odin__footer-title {
-  margin: 0 0 0.75rem;
-  color: var(--pref-text-color);
-  font-family: inherit;
-  font-size: 1.1rem;
-}
-
-.odin__footer-list {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-
-  a,
-  a:visited {
-    color: var(--pref-text-color);
-    font-family: inherit;
-  }
-}
-
-.odin__copyright {
-  max-width: $odin-width;
-  margin: 0 auto;
-  padding: 1rem $odin-gutter;
-  border-top: $odin-rule;
-  font-size: 0.9rem;
-  text-align: center;
 }

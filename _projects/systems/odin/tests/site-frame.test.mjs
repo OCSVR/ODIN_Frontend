@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { backgroundOf, isDarkColor, logoKeyFor, startFrame, startMenu, watchTheme } from '../js/site-frame.js';
+import { backgroundOf, isDarkColor, logoKeyFor, startFrame, watchTheme } from '../js/site-frame.js';
 import { container, element } from './fake-page.mjs';
 
 const SITE = {
@@ -15,19 +15,18 @@ const imageUrl = (name) => `https://images.example/${name}`;
 const DARK = 'rgb(11, 18, 32)';
 const LIGHT = 'rgb(255, 255, 255)';
 
-// A page with a menu, a header logo, and a footer part holding a logo, a tagline and a link.
+// A page with two parts that wait for the site basics: one holding a logo, the other a logo, a
+// tagline and a link.
 function frame() {
-  const toggle = element({ odinMenuToggle: '' }, { hidden: true });
-  const nav = container([toggle], { odinNav: '' });
-  const headerLogo = element({ odinLogo: '' });
-  const footerLogo = element({ odinLogo: '' });
+  const firstLogo = element({ odinLogo: '' });
+  const secondLogo = element({ odinLogo: '' });
   const tagline = element({ odinField: 'tagline' });
   const link = element({ odinHref: 'instagram' });
-  const headerPart = container([headerLogo], { odinFrame: '' }, { hidden: true });
-  const footerPart = container([footerLogo, tagline, link], { odinFrame: '' }, { hidden: true });
-  const root = container([nav, toggle, headerPart, footerPart, headerLogo, footerLogo, tagline, link]);
-  const backgrounds = new Map([[headerLogo, DARK], [footerLogo, LIGHT]]);
-  return { root, nav, toggle, headerLogo, footerLogo, tagline, link, headerPart, footerPart, backgrounds };
+  const firstPart = container([firstLogo], { odinFrame: '' }, { hidden: true });
+  const secondPart = container([secondLogo, tagline, link], { odinFrame: '' }, { hidden: true });
+  const root = container([firstPart, secondPart, firstLogo, secondLogo, tagline, link]);
+  const backgrounds = new Map([[firstLogo, DARK], [secondLogo, LIGHT]]);
+  return { root, firstLogo, secondLogo, tagline, link, firstPart, secondPart, backgrounds };
 }
 
 test('isDarkColor reads the color forms a browser gives', () => {
@@ -123,66 +122,25 @@ test('watchTheme stops watching, and drops a call it had not made yet', (t) => {
   assert.equal(made[0].connected, false);
 });
 
-test('startMenu shows the button and starts with the menu closed', () => {
-  const { nav, toggle } = frame();
-  startMenu(nav);
-  assert.equal(toggle.hidden, false);
-  assert.equal(nav.dataset.odinMenu, 'closed');
-  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-});
-
-test('the button opens and closes the menu, and Escape closes it and returns to the button', () => {
-  const { nav, toggle } = frame();
-  startMenu(nav);
-  toggle.fire('click');
-  assert.equal(nav.dataset.odinMenu, 'open');
-  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-  toggle.fire('click');
-  assert.equal(nav.dataset.odinMenu, 'closed');
-
-  nav.fire('keydown', { key: 'Escape' });
-  assert.equal(toggle.focused, false);
-  toggle.fire('click');
-  nav.fire('keydown', { key: 'Escape' });
-  assert.equal(nav.dataset.odinMenu, 'closed');
-  assert.equal(toggle.focused, true);
-});
-
-test('only Escape closes the menu from the keyboard', () => {
-  const { nav, toggle } = frame();
-  startMenu(nav);
-  toggle.fire('click');
-  for (const key of ['Enter', 'Tab', 'ArrowDown', 'a']) {
-    nav.fire('keydown', { key });
-    assert.equal(nav.dataset.odinMenu, 'open', key);
-  }
-  assert.equal(toggle.focused, false);
-});
-
-test('a menu without its button is refused', () => {
-  assert.throws(() => startMenu(container([], { odinNav: '' })), /no toggle button/);
-});
-
 test('startFrame fills and shows the parts, with the logo that suits each background', async () => {
   const page = frame();
   const shown = await startFrame({
     root: page.root, load: async () => SITE, imageUrl, background: (image) => page.backgrounds.get(image), watch: () => {}, report: () => {},
   });
   assert.equal(shown, true);
-  assert.deepEqual([page.headerPart.hidden, page.footerPart.hidden], [false, false]);
+  assert.deepEqual([page.firstPart.hidden, page.secondPart.hidden], [false, false]);
   assert.equal(page.tagline.textContent, 'An example tagline.');
   assert.equal(page.link.getAttribute('href'), 'https://social.example/company');
-  assert.equal(page.headerLogo.getAttribute('src'), 'https://images.example/logo-light.svg');
-  assert.equal(page.footerLogo.getAttribute('src'), 'https://images.example/logo-dark.svg');
-  assert.equal(page.headerLogo.getAttribute('alt'), 'Example Company');
-  assert.equal(page.nav.dataset.odinMenu, 'closed');
+  assert.equal(page.firstLogo.getAttribute('src'), 'https://images.example/logo-light.svg');
+  assert.equal(page.secondLogo.getAttribute('src'), 'https://images.example/logo-dark.svg');
+  assert.equal(page.firstLogo.getAttribute('alt'), 'Example Company');
 });
 
 test('startFrame tells white artwork whether it sits on a dark or a light background, and again when the theme changes', async () => {
   const page = frame();
   const artwork = element({ odinBackdrop: '' });
-  const root = container([page.nav, page.toggle, page.headerPart, page.footerPart, page.headerLogo, page.footerLogo, page.tagline, page.link, artwork]);
-  const backgrounds = new Map([[page.headerLogo, DARK], [page.footerLogo, DARK], [artwork, LIGHT]]);
+  const root = container([page.firstPart, page.secondPart, page.firstLogo, page.secondLogo, page.tagline, page.link, artwork]);
+  const backgrounds = new Map([[page.firstLogo, DARK], [page.secondLogo, DARK], [artwork, LIGHT]]);
   let themeChanged;
   await startFrame({
     root, load: async () => SITE, imageUrl, background: (item) => backgrounds.get(item),
@@ -201,12 +159,12 @@ test('startFrame picks the logos again when the theme changes', async () => {
     root: page.root, load: async () => SITE, imageUrl, background: (image) => page.backgrounds.get(image),
     watch: (onChange) => { themeChanged = onChange; }, report: () => {},
   });
-  page.backgrounds.set(page.headerLogo, LIGHT);
+  page.backgrounds.set(page.firstLogo, LIGHT);
   themeChanged();
-  assert.equal(page.headerLogo.getAttribute('src'), 'https://images.example/logo-dark.svg');
+  assert.equal(page.firstLogo.getAttribute('src'), 'https://images.example/logo-dark.svg');
 });
 
-test('startFrame keeps the parts hidden when the site basics cannot be loaded, and still starts the menu', async () => {
+test('startFrame keeps the parts hidden when the site basics cannot be loaded', async () => {
   const page = frame();
   const failure = new Error('Flask is down');
   const reports = [];
@@ -216,11 +174,10 @@ test('startFrame keeps the parts hidden when the site basics cannot be loaded, a
     watch: () => { watched = true; }, report: (...args) => reports.push(args),
   });
   assert.equal(shown, false);
-  assert.deepEqual([page.headerPart.hidden, page.footerPart.hidden], [true, true]);
-  assert.equal(page.headerLogo.getAttribute('src'), null);
+  assert.deepEqual([page.firstPart.hidden, page.secondPart.hidden], [true, true]);
+  assert.equal(page.firstLogo.getAttribute('src'), null);
   assert.equal(reports[0][1], failure);
   assert.equal(watched, false);
-  assert.equal(page.toggle.hidden, false);
 });
 
 test('startFrame keeps the parts hidden when a logo\'s address cannot be built', async () => {
@@ -232,27 +189,8 @@ test('startFrame keeps the parts hidden when a logo\'s address cannot be built',
     watch: () => {}, report: (...args) => reports.push(args),
   });
   assert.equal(shown, false);
-  assert.deepEqual([page.headerPart.hidden, page.footerPart.hidden], [true, true]);
+  assert.deepEqual([page.firstPart.hidden, page.secondPart.hidden], [true, true]);
   assert.equal(reports[0][1], failure);
-});
-
-test('startFrame adds the company\'s name to the page title', async () => {
-  const titles = [['Connection check', 'Connection check | Example Company'], ['', 'Example Company'], ['Example Company', 'Example Company']];
-  for (const [before, after] of titles) {
-    const page = frame();
-    page.root.title = before;
-    await startFrame({ root: page.root, load: async () => SITE, imageUrl, background: () => DARK, watch: () => {}, report: () => {} });
-    assert.equal(page.root.title, after);
-  }
-});
-
-test('startFrame leaves the page title alone when the site basics cannot be loaded', async () => {
-  const page = frame();
-  page.root.title = 'Connection check';
-  await startFrame({
-    root: page.root, load: async () => { throw new Error('Flask is down'); }, imageUrl, background: () => DARK, watch: () => {}, report: () => {},
-  });
-  assert.equal(page.root.title, 'Connection check');
 });
 
 test('startFrame shows no part when one value is unusable', async () => {
@@ -262,6 +200,6 @@ test('startFrame shows no part when one value is unusable', async () => {
     background: () => DARK, watch: () => {}, report: () => {},
   });
   assert.equal(shown, false);
-  assert.deepEqual([page.headerPart.hidden, page.footerPart.hidden], [true, true]);
+  assert.deepEqual([page.firstPart.hidden, page.secondPart.hidden], [true, true]);
   assert.equal(page.link.getAttribute('href'), null);
 });
