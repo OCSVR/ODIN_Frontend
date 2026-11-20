@@ -65,9 +65,11 @@ element around them `role="status"` so a screen reader announces the change.
 ## Resources
 
 `distribution.json` lists each source and where it is published. Each
-destination must be an `odin` folder inside one of the shared `projects/` roots.
-`scripts/publish_project.rb` lists the roots a manifest may use. Git ignores those
-published copies (see "Project distributions" in `.gitignore`), so edit the sources here.
+destination must be an `odin` folder inside one of the shared `projects/` folders;
+`tests/distribution.test.mjs` checks this. `scripts/publish_project.rb`
+(`DESTINATIONS`) lists the top-level folders any manifest may publish under. Git
+ignores the published copies (see "Project distributions" in `.gitignore`), so
+edit the sources here.
 
 | Source | Published destination |
 | --- | --- |
@@ -77,8 +79,9 @@ published copies (see "Project distributions" in `.gitignore`), so edit the sour
 | `js/` | `assets/js/projects/odin/` |
 | `sass/main.scss` | `_sass/projects/odin/main.scss` |
 
-`pages/connection.md` is the connection check at `/odin/connection/`. It is for
-the team and is left out of the menu and of search.
+`pages/connection.md` is the connection check. Its permalink is
+`/odin/connection/`, which `baseurl` puts at `/ODIN_Frontend/odin/connection/`.
+It is for the team and is left out of the menu and of search.
 
 The system is registered as `systems/odin:dev` in `_projects/.makeprojects` and
 uses the generated Makefile.
@@ -92,5 +95,6 @@ node --test _projects/systems/odin/tests/*.test.mjs
 ```
 
 To check the connection in a browser, start Flask on port 8587 and the site
-with `make`, then open `http://localhost:4500/odin/connection/`. Stop Flask and
+with `make`, then open `http://localhost:4500/ODIN_Frontend/odin/connection/`.
+Stop Flask and
 reload to see the unavailable message.

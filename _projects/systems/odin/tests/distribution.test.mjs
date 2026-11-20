@@ -121,6 +121,19 @@ test('the layout leaves the company\'s name out of the page title', () => {
   assert.ok(!layout.includes('site.title'), 'the layout prints the site title from _config.yml');
 });
 
+// The site is served under a base address (/ODIN_Frontend), so a link printed without it is broken.
+test('every link the header and footer print goes through relative_url', () => {
+  for (const file of ['header.html', 'footer.html']) {
+    const markup = readFileSync(new URL(`_includes/${file}`, system), 'utf8');
+    // \s keeps data-odin-href out: that one names a field, and the script fills in its address
+    const links = [...markup.matchAll(/\shref="([^"]*)"/g)].map(([, address]) => address);
+    assert.ok(links.length > 0, `${file} prints no link`);
+    for (const address of links) {
+      assert.match(address, /^\{\{ .*\| relative_url \}\}$/, `${file} prints the link ${address} without relative_url`);
+    }
+  }
+});
+
 // A page whose import does not resolve stays on its loading message, so check every one: the file
 // exists where the page asks for it, and it exports the names the page imports. An import written
 // any other way fails here, so it cannot go unchecked.

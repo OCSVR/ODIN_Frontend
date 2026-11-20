@@ -5,7 +5,6 @@ description: Checks that the ODIN frontend can read the site basics from the Fla
 permalink: /odin/connection/
 hide: true
 search_exclude: true
-show_reading_time: false
 ---
 
 <!-- markdownlint-capture -->

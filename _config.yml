@@ -21,7 +21,8 @@ github_username: OCSVR
 github_repo: "ODIN_Frontend"
 baseurl: "/ODIN_Frontend"
 future: true
-# ODIN has a Flask backend only. With this false, pages make no calls to a Spring server.
+# ODIN has a Flask backend only. With this false, login, logout, the navbar and /profile skip
+# Spring, and the analytics tracker is not loaded.
 spring: false
 
 # The ODIN Diagnostics website's menus, drawn by the header and footer in _projects/systems/odin/_includes.
