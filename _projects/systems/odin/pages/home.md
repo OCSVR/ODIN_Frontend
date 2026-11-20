@@ -31,10 +31,10 @@ permalink: /
 
       <section data-odin-section="statistics">
         <h2 class="ocs__section-title" data-odin-field="title"></h2>
-        <div class="ocs__grid ocs__grid--card" data-odin-items>
+        <div class="ocs__stats" data-odin-items>
           <template>
-            <div class="ocs__grid-cell">
-              <h3 data-odin-field="title"></h3>
+            <div class="ocs__stat">
+              <strong class="ocs__stat-value" data-odin-field="title"></strong>
               <p class="ocs__text" data-odin-field="text"></p>
             </div>
           </template>
@@ -42,10 +42,10 @@ permalink: /
       </section>
 
       <section class="ocs__split" data-odin-section="features">
-        <div class="ocs__grid ocs__grid--card" data-odin-items>
+        <div class="ocs__stack" data-odin-items>
           <template>
-            <div class="ocs__grid-cell">
-              <h2 class="odin__item-title" data-odin-field="title"></h2>
+            <div>
+              <h3 data-odin-field="title"></h3>
               <p class="ocs__text" data-odin-field="text"></p>
             </div>
           </template>
@@ -71,7 +71,7 @@ permalink: /
       </section>
 
       <section class="ocs__callout" data-odin-section="fda">
-        <h2 data-odin-field="title"></h2>
+        <h2 class="ocs__section-title" data-odin-field="title"></h2>
         <p class="ocs__text" data-odin-field="text"></p>
       </section>
 
@@ -92,11 +92,14 @@ permalink: /
   import { showPage } from '{{ site.baseurl }}/assets/js/projects/odin/page-view.js';
 
   const content = createContent(new Backend(pythonURI, fetchOptions));
-  // The contact block's words are a page of their own, because the Contact Us page shows it too.
+  // The contact block's words are the backend's contact page, so that page is loaded here too.
   const load = async () => {
     const [home, contact, site] = await Promise.all([content.page('home'), content.page('contact'), content.site()]);
     return { sections: [...home, ...contact], site };
   };
-  showPage({ root: document.querySelector('[data-odin-page]'), load, imageUrl: content.imageUrl });
+  const shown = await showPage({ root: document.querySelector('[data-odin-page]'), load, imageUrl: content.imageUrl });
+  // A link to a part of the page, such as #contact, arrives before that part is showing
+  const target = shown && location.hash ? document.getElementById(location.hash.slice(1)) : null;
+  if (target) target.scrollIntoView();
 </script>
 <!-- markdownlint-restore -->

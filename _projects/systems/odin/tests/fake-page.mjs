@@ -13,6 +13,7 @@ const DATASET_KEYS = {
   '[data-odin-image]': 'odinImage',
   '[data-odin-items]': 'odinItems',
   '[data-odin-basic]': 'odinBasic',
+  '[data-odin-backdrop]': 'odinBackdrop',
   '[data-odin-frame]': 'odinFrame',
   '[data-odin-logo]': 'odinLogo',
   '[data-odin-nav]': 'odinNav',
@@ -37,12 +38,16 @@ export function element(dataset = {}, { hidden = false, parentElement = null } =
   };
 }
 
-// An element that holds others. `children` is every element under it, however deep.
+// An element that holds others. `children` is every element under it, however deep. A list among
+// them also brings in what its copies hold, because in a browser a list's copies are inside the
+// element that holds the list.
 export function container(children, dataset = {}, options = {}) {
   const matching = (selector) => {
     const key = DATASET_KEYS[selector];
     if (!key) throw new Error(`The fake page cannot read the selector ${selector}`);
-    return children.filter((child) => key in child.dataset);
+    const own = children.filter((child) => key in child.dataset);
+    const inCopies = children.flatMap((child) => (child.copies || []).flatMap((copy) => [...copy.querySelectorAll(selector)]));
+    return [...own, ...inCopies];
   };
   return {
     ...element(dataset, options),
@@ -51,19 +56,22 @@ export function container(children, dataset = {}, options = {}) {
   };
 }
 
-// A list marked data-odin-items. Its <template> is stood in for by `makeCopy`, which builds what a
-// browser would clone from it; pass null for a list with no template. `copies` is what the list
-// holds besides its template.
+// A list marked data-odin-items, holding its <template> as a browser's would. `makeCopy` builds
+// what cloning the template's content gives; pass null for a list with no template. `children` is
+// what the list holds, the template included, and `copies` is the rest.
 export function itemList(makeCopy) {
-  const template = makeCopy ? { content: { cloneNode: () => makeCopy() } } : null;
+  const template = makeCopy
+    ? { isTemplate: true, content: { cloneNode: (deep) => (deep ? makeCopy() : container([])) } }
+    : null;
   const list = {
     ...element({ odinItems: '' }),
-    copies: [],
+    children: template ? [template] : [],
+    get copies() { return list.children.filter((child) => !child.isTemplate); },
     querySelector: (selector) => {
       if (selector !== 'template') throw new Error(`The fake list cannot read the selector ${selector}`);
-      return template;
+      return list.children.find((child) => child.isTemplate) ?? null;
     },
-    replaceChildren(...nodes) { list.copies = nodes.filter((node) => node !== template); },
+    replaceChildren(...nodes) { list.children = nodes; },
   };
   return list;
 }

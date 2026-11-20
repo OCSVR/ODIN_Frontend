@@ -132,6 +132,8 @@ test('the ODIN home page is the only page at the site root', () => {
 
 // A misspelled mark makes its page unavailable for every visitor, so the marks are checked here.
 const SECTION_PARTS = ['kicker', 'title', 'text', 'action'];
+// The sections the backend's pages have, by name. A page may only mark one of these.
+const BACKEND_SECTIONS = ['hero', 'statistics', 'features', 'how_it_works', 'pitch', 'fda', 'intro', 'details', 'phone', 'email', 'address'];
 
 test('each page has all three state blocks', () => {
   for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
@@ -147,8 +149,14 @@ test('the pages and the contact block name only parts the backend sends', () => 
     const markup = readFileSync(new URL(name, system), 'utf8');
     const marked = (attribute) => [...markup.matchAll(new RegExp(`${attribute}="([^"]+)"`, 'g'))].map(([, value]) => value);
     assert.ok(marked('data-odin-field').length > 0, `${name} marks no field`);
+    // Only the connection check shows the site basics as fields. A page built from sections shows
+    // them with data-odin-basic, because a field inside a section's element is one of its parts.
+    const fields = name === 'pages/connection.md' ? SITE_FIELDS : SECTION_PARTS;
     for (const field of marked('data-odin-field')) {
-      assert.ok([...SITE_FIELDS, ...SECTION_PARTS].includes(field), `${name} marks the field ${field}, which the backend does not send`);
+      assert.ok(fields.includes(field), `${name} marks the field ${field}, which it would not be given`);
+    }
+    for (const section of marked('data-odin-section')) {
+      assert.ok(BACKEND_SECTIONS.includes(section), `${name} marks the section ${section}, which no backend page has`);
     }
     for (const basic of marked('data-odin-basic')) {
       assert.ok(SITE_FIELDS.includes(basic), `${name} shows the site basic ${basic}, which the backend does not send`);

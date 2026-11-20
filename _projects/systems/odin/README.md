@@ -5,9 +5,9 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 copies them to the paths Jekyll reads.
 
 So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, the home page, the contact block the
-home page shares with the Contact Us page, and one page that checks the
-connection. The About and Contact Us pages come in later tasks.
+scripts that read content from the backend, the home page with its contact block,
+and one page that checks the connection. The About and Contact Us pages come in
+later tasks. Contact Us will include the same block.
 
 ## Content comes from the backend
 
@@ -37,7 +37,8 @@ on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
 start with `odin__`. Page content uses the shared OCS grammar. The pages add a
-few `odin__` classes for sizes the grammar does not have.
+few `odin__` classes where the grammar has none: the hero's sizes and the partner
+logo.
 
 ## The scripts
 
@@ -65,16 +66,22 @@ few `odin__` classes for sizes the grammar does not have.
     per item of the section, and `data-odin-field` in the template takes the
     item's `title` and `text`.
 
-  Anywhere on the page, `data-odin-basic="<key>"` takes a site basic, such as
-  `phone`. Add `data-odin-opens="tel"` or `"mailto"` to make it a link that
-  opens the phone or email app. `load` resolves to `{ sections, site }`, and
-  `site` is only needed by a page that shows site basics.
+  Anywhere inside the element handed to `showPage`, `data-odin-basic="<key>"`
+  takes a site basic, such as `phone`. Add `data-odin-opens="tel"` or `"mailto"`
+  to make it a link that opens the phone or email app. Text that makes no clean
+  link, such as a number with an extension, is shown without one. `load`
+  resolves to `{ sections, site }`, and `site` is only needed by a page that
+  shows site basics.
 
-  A part the markup asks for must be there with text in it, or the whole page is
-  unavailable. Keep one section's element out of another's, because a section
-  fills every mark inside its element.
+  The backend must send text for every part the markup asks for, or the whole
+  page is unavailable. Do not nest one section's element in another's: a section
+  fills every mark inside its element. A page can show sections of more than one
+  backend page, as long as no two have the same name.
 - `js/site-frame.js` runs the header and footer: `startFrame` starts the phone
-  menu, fills the parts marked `data-odin-frame` and picks the logos.
+  menu, fills the parts marked `data-odin-frame` and picks the logos. It also
+  tells any element marked `data-odin-backdrop` whether what is behind it is
+  `dark` or `light`, which the styles use to turn the white partner logo dark on
+  a light theme.
 
 A page's own script imports `assets/js/api/config.js` and Login's
 `assets/js/login/backend.js` with `{{ site.baseurl }}`, builds the Flask backend

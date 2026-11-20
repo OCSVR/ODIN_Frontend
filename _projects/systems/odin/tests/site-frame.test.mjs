@@ -178,6 +178,22 @@ test('startFrame fills and shows the parts, with the logo that suits each backgr
   assert.equal(page.nav.dataset.odinMenu, 'closed');
 });
 
+test('startFrame tells white artwork whether it sits on a dark or a light background, and again when the theme changes', async () => {
+  const page = frame();
+  const artwork = element({ odinBackdrop: '' });
+  const root = container([page.nav, page.toggle, page.headerPart, page.footerPart, page.headerLogo, page.footerLogo, page.tagline, page.link, artwork]);
+  const backgrounds = new Map([[page.headerLogo, DARK], [page.footerLogo, DARK], [artwork, LIGHT]]);
+  let themeChanged;
+  await startFrame({
+    root, load: async () => SITE, imageUrl, background: (item) => backgrounds.get(item),
+    watch: (onChange) => { themeChanged = onChange; }, report: () => {},
+  });
+  assert.equal(artwork.dataset.odinBackdrop, 'light');
+  backgrounds.set(artwork, DARK);
+  themeChanged();
+  assert.equal(artwork.dataset.odinBackdrop, 'dark');
+});
+
 test('startFrame picks the logos again when the theme changes', async () => {
   const page = frame();
   let themeChanged;

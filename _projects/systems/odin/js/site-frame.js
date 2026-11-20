@@ -90,6 +90,14 @@ function showLogos(root, site, imageUrl, background) {
   }
 }
 
+// Tells each element marked data-odin-backdrop whether what is behind it is dark or light. The
+// styles use it to turn white artwork dark on a light theme.
+function tellBackdrops(root, background) {
+  for (const element of root.querySelectorAll('[data-odin-backdrop]')) {
+    element.dataset.odinBackdrop = isDarkColor(background(element)) ? 'dark' : 'light';
+  }
+}
+
 // Adds the company's name to the page's title, which the markup leaves out because the name is content.
 function nameTitle(root, name) {
   if (typeof root.title !== 'string' || root.title.includes(name)) return;
@@ -107,12 +115,16 @@ export async function startFrame({ root, load, imageUrl, background = background
     site = await load();
     fillFields(parts, site);
     showLogos(root, site, imageUrl, background);
+    tellBackdrops(root, background);
   } catch (error) {
     report('The ODIN header and footer could not show the site basics.', error);
     return false;
   }
   for (const part of parts) part.hidden = false;
   nameTitle(root, site.name);
-  watch(() => showLogos(root, site, imageUrl, background));
+  watch(() => {
+    showLogos(root, site, imageUrl, background);
+    tellBackdrops(root, background);
+  });
   return true;
 }

@@ -4,10 +4,15 @@
 
 import { clearFields, fillFields, isText, showContent } from './content-view.js';
 
-// How a site basic opens when it is a link: in the phone app or in the email app.
+// How a site basic opens when it is a link: in the phone app or in the email app. Each gives the
+// link's address, or null for text it cannot safely turn into one: a number with letters or an
+// extension, or an email with a character that would change what the link does.
 const OPENERS = {
-  tel: (value) => `tel:${value.replace(/[^\d+]/g, '')}`,
-  mailto: (value) => `mailto:${value}`,
+  tel: (value) => {
+    const number = value.replace(/[\s().-]/g, '');
+    return /^\+?\d{7,15}$/.test(number) ? `tel:${number}` : null;
+  },
+  mailto: (value) => (/^[^\s@?#%&]+@[^\s@?#%&]+\.[^\s@?#%&]+$/.test(value) ? `mailto:${value}` : null),
 };
 
 // Puts a section's image into each place marked for it.
@@ -49,7 +54,18 @@ function fillBasics(root, site) {
     const opens = element.dataset.odinOpens;
     if (opens !== undefined && !Object.hasOwn(OPENERS, opens)) throw new Error(`Nothing opens a ${opens} link`);
     element.textContent = value;
-    if (opens !== undefined) element.setAttribute('href', OPENERS[opens](value));
+    // Text that makes no clean link is still shown, as plain text
+    const address = opens === undefined ? null : OPENERS[opens](value);
+    if (address === null) element.removeAttribute('href');
+    else element.setAttribute('href', address);
+  }
+}
+
+// Takes every list in `scope` back to just its template.
+function emptyLists(scope) {
+  for (const list of scope.querySelectorAll('[data-odin-items]')) {
+    const template = list.querySelector('template');
+    if (template) list.replaceChildren(template);
   }
 }
 
@@ -59,6 +75,13 @@ export function fillSections(root, { sections, site }, { imageUrl }) {
   const elements = [...root.querySelectorAll('[data-odin-section]')];
   // A page whose marks are misspelled would otherwise show as ready with nothing in it
   if (elements.length === 0) throw new Error('The page marks no section');
+  // A page can show sections of more than one backend page. Two with one name would leave it to
+  // their order which one the visitor sees.
+  const names = sections.map((section) => section.name);
+  const twice = names.find((name, index) => names.indexOf(name) !== index);
+  if (twice !== undefined) throw new Error(`The page was given two sections named ${twice}`);
+  // Copies from an earlier fill hold marks of their own, which the section's parts must not go into
+  emptyLists(root);
   for (const element of elements) {
     const name = element.dataset.odinSection;
     const section = sections.find((candidate) => candidate.name === name);
@@ -76,10 +99,7 @@ export function clearSections(root) {
     image.removeAttribute('src');
     image.setAttribute('alt', '');
   }
-  for (const list of root.querySelectorAll('[data-odin-items]')) {
-    const template = list.querySelector('template');
-    if (template) list.replaceChildren(template);
-  }
+  emptyLists(root);
   for (const element of root.querySelectorAll('[data-odin-basic]')) {
     element.textContent = '';
     element.removeAttribute('href');

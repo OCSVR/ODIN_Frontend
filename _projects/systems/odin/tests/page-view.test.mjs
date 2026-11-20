@@ -97,11 +97,29 @@ test('a list gets one copy of its template per item, in order, each with that it
   assert.equal(parts.facts.marks.title.textContent, 'Some facts');
 });
 
-test('filling a list again replaces its copies, so it never holds an item twice', () => {
+test('a filled list still starts with its template, followed by the copies', () => {
+  const { root, parts } = page(LISTED);
+  fillSections(root, { sections: [FACTS] }, { imageUrl });
+  const { children } = parts.facts.list;
+  assert.equal(children.length, 3);
+  assert.equal(children[0].isTemplate, true);
+  assert.ok(children.slice(1).every((child) => !child.isTemplate));
+});
+
+// The copies sit inside the section's element, so a second fill must not put the section's own
+// parts into them, or ask the section for parts only an item has.
+test('filling a page again replaces each list\'s copies, so it never holds an item twice', () => {
   const { root, parts } = page(LISTED);
   fillSections(root, { sections: [FACTS] }, { imageUrl });
   fillSections(root, { sections: [{ ...FACTS, items: [FACTS.items[1]] }] }, { imageUrl });
-  assert.deepEqual(parts.facts.list.copies.map((copy) => copy.marks.title.textContent), ['20%']);
+  assert.deepEqual(parts.facts.list.copies.map((copy) => [copy.marks.title.textContent, copy.marks.text.textContent]), [['20%', 'Of another']]);
+  assert.equal(parts.facts.marks.title.textContent, 'Some facts');
+});
+
+test('fillSections refuses two sections with one name, so it is never a matter of order which shows', () => {
+  const { root, parts } = page();
+  assert.throws(() => fillSections(root, { sections: [HERO, PITCH, { ...HERO, title: 'Another' }] }, { imageUrl }), /two sections named hero/);
+  assert.equal(parts.hero.marks.title.textContent, '');
 });
 
 test('fillSections refuses a list whose section has no items, or an item lacking a part the list shows', () => {
@@ -134,6 +152,22 @@ test('a phone number keeps its leading plus sign in the link', () => {
   assert.equal(basics.phone.getAttribute('href'), 'tel:+15550100000');
 });
 
+test('a phone number or email that makes no clean link is shown as plain text', () => {
+  const unclean = [
+    ['phone', 'tel', '(555) 010-0000 ext. 12'], ['phone', 'tel', '1-800-EXAMPLE'], ['phone', 'tel', '(555) 010-0000 / (555) 010-0001'],
+    ['phone', 'tel', 'Call us any time'], ['phone', 'tel', '555'],
+    ['email', 'mailto', 'sales#west@example.com'], ['email', 'mailto', 'hello@example.com?cc=other@example.com'], ['email', 'mailto', 'Write to us'],
+    ['email', 'mailto', 'hello@example'],
+  ];
+  for (const [key, opens, value] of unclean) {
+    const { root, basics } = page([{ name: 'pitch', fields: ['title'] }], [[key, opens]]);
+    basics[key].setAttribute('href', 'left-over');
+    fillSections(root, { sections: [PITCH], site: { [key]: value } }, { imageUrl });
+    assert.equal(basics[key].textContent, value);
+    assert.equal(basics[key].getAttribute('href'), null, value);
+  }
+});
+
 test('fillSections refuses a page that shows a site basic it was not given, or one that is blank', () => {
   for (const site of [undefined, null, {}, { phone: '' }, { phone: '  ' }, { phone: 5550100000 }, Object.create(SITE)]) {
     const { root, basics } = page([{ name: 'pitch', fields: ['title'] }], [['phone', 'tel']]);
@@ -156,6 +190,7 @@ test('clearSections empties the parts, the image, the lists and the site basics'
   assert.equal(parts.hero.picture.getAttribute('src'), null);
   assert.equal(parts.hero.picture.getAttribute('alt'), '');
   assert.deepEqual(parts.facts.list.copies, []);
+  assert.equal(parts.facts.list.children[0].isTemplate, true);
   assert.equal(basics.phone.textContent, '');
   assert.equal(basics.phone.getAttribute('href'), null);
 });

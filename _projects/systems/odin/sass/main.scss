@@ -22,13 +22,20 @@ $odin-rule: 1px solid var(--ui-border);
   // fixed colors. ODIN pages have one h1 each, and their headings take the theme's text color.
   h1 {
     display: block;
+    text-shadow: none;
   }
 
   h1,
   h2,
   h3 {
     color: var(--pref-text-color);
-    text-shadow: none;
+  }
+
+  // The site lays an h2 out as a flex row, which stops a long word from wrapping on a phone
+  h2,
+  h3 {
+    display: block;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -196,20 +203,17 @@ $odin-rule: 1px solid var(--ui-border);
   object-fit: cover;
 }
 
-// A heading inside a card, where the site's size for an h2 would not fit a phone
-.odin__item-title {
-  font-size: 1.4rem;
-  line-height: 1.3;
-}
-
-// The partner's logo is white on a clear background. Blending it against what is behind it turns
-// it dark on a light theme, so it shows in every theme without a fixed color.
+// The partner's logo is white on a clear background, so a light theme would hide it. The script
+// says whether what is behind it is light, and then the logo is turned dark.
 .odin__partner {
   width: 100%;
   max-width: 14rem;
   height: auto;
-  border-radius: 0;
-  mix-blend-mode: difference;
+  aspect-ratio: 1 / 1;
+
+  &[data-odin-backdrop="light"] {
+    filter: invert(1);
+  }
 }
 
 .odin__footer {
