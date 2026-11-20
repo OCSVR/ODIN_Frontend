@@ -132,10 +132,10 @@ edit the sources here.
 backend's `contact` page and the site basics, as `pages/home.md` and
 `pages/contact.md` do.
 
-`pages/about.md` is the About page, at `/about/`: the title, the mission and the
-team. It took the place of the template's own `navigation/about.md`, which was
-removed with its photos in `images/about/` and its `nav_pages` entry in
-`_config.yml`. Keep that file from coming back, or two pages claim `/about/`.
+`pages/about.md` is the About page, at `/about/`: the title and the mission. It
+took the place of the template's own `navigation/about.md`, which was removed
+with its photos in `images/about/` and its `nav_pages` entry in `_config.yml`.
+Keep that file from coming back, or two pages claim `/about/`.
 
 `pages/contact.md` is the Contact Us page, at `/contact/`: the page's title and
 the line under it, then the contact block.
