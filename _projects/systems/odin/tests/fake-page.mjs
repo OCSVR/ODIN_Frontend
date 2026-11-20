@@ -25,8 +25,6 @@ export function element(dataset = {}, { hidden = false, parentElement = null } =
     hidden,
     parentElement,
     textContent: '',
-    removed: false,
-    remove() { this.removed = true; },
     setAttribute(name, value) { attributes.set(name, String(value)); },
     getAttribute(name) { return attributes.has(name) ? attributes.get(name) : null; },
     removeAttribute(name) { attributes.delete(name); },
@@ -40,8 +38,7 @@ export function container(children, dataset = {}, options = {}) {
   const matching = (selector) => {
     const key = DATASET_KEYS[selector];
     if (!key) throw new Error(`The fake page cannot read the selector ${selector}`);
-    // An element that was removed is no longer found, as in a browser
-    const own = children.filter((child) => key in child.dataset && !child.removed);
+    const own = children.filter((child) => key in child.dataset);
     const inCopies = children.flatMap((child) => (child.copies || []).flatMap((copy) => [...copy.querySelectorAll(selector)]));
     return [...own, ...inCopies];
   };

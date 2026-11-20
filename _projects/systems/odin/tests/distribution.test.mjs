@@ -159,10 +159,11 @@ test('the ODIN home page is the only page at the site root', () => {
 
 // A misspelled mark makes its page unavailable for every visitor, so the marks are checked here.
 const SECTION_PARTS = ['kicker', 'title', 'text', 'action'];
-// The other parts an item of a list can have
-const ITEM_PARTS = ['subtitle', 'note'];
-// The sections the backend's pages have, by name. A page may only mark one of these.
-const BACKEND_SECTIONS = ['hero', 'statistics', 'features', 'how_it_works', 'pitch', 'fda', 'intro', 'mission', 'team', 'details', 'phone', 'email', 'address'];
+// An item of a list has these two parts
+const ITEM_PARTS = ['title', 'text'];
+// The backend sections the site shows, by name. A page may only mark one of these. The backend's
+// about page also has a team section, which the site does not show.
+const SHOWN_SECTIONS = ['hero', 'statistics', 'features', 'how_it_works', 'pitch', 'fda', 'intro', 'mission', 'details', 'phone', 'email', 'address'];
 
 test('each page has all three state blocks', () => {
   for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
@@ -186,11 +187,14 @@ test('the pages and the contact block name only parts the backend sends', () => 
     for (const field of [...outside.matchAll(/data-odin-field="([^"]+)"/g)].map(([, value]) => value)) {
       assert.ok(fields.includes(field), `${name} marks the field ${field} outside a list, where it would not be given`);
     }
-    for (const field of marked('data-odin-field')) {
-      assert.ok([...fields, ...ITEM_PARTS].includes(field), `${name} marks the field ${field}, which it would not be given`);
+    // Inside a template only an item's own parts are filled
+    const templates = (markup.match(/<template>[\s\S]*?<\/template>/g) || []).join('');
+    for (const field of [...templates.matchAll(/data-odin-field="([^"]+)"/g)].map(([, value]) => value)) {
+      assert.ok(ITEM_PARTS.includes(field), `${name} marks the field ${field} in a list, where an item has no such part`);
     }
+    assert.ok(!/data-odin-(image|href)/.test(templates), `${name} marks an image or a link in a list, which page-view.js does not fill`);
     for (const section of marked('data-odin-section')) {
-      assert.ok(BACKEND_SECTIONS.includes(section), `${name} marks the section ${section}, which no backend page has`);
+      assert.ok(SHOWN_SECTIONS.includes(section), `${name} marks the section ${section}, which the site does not show`);
     }
     for (const basic of marked('data-odin-basic')) {
       assert.ok(SITE_FIELDS.includes(basic), `${name} shows the site basic ${basic}, which the backend does not send`);

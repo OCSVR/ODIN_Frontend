@@ -20,16 +20,8 @@ function page(sections = [{ name: 'hero', fields: ['kicker', 'title'], image: tr
     const marks = Object.fromEntries(fields.map((key) => [key, element({ odinField: key })]));
     const picture = image ? element({ odinImage: '' }) : null;
     const makeCopy = () => {
-      const copyMarks = Object.fromEntries(items.filter((key) => !['image', 'link'].includes(key)).map((key) => [key, element({ odinField: key })]));
-      const photo = items.includes('image') ? element({ odinImage: '' }) : null;
-      // The link around a name, as the About page has it
-      const profile = items.includes('link') ? element({ odinHref: 'link' }) : null;
-      if (profile) {
-        profile.setAttribute('target', '_blank');
-        profile.setAttribute('rel', 'noopener noreferrer');
-      }
-      const inside = [...Object.values(copyMarks), ...(photo ? [photo] : []), ...(profile ? [profile] : [])];
-      return { ...container(inside), marks: copyMarks, photo, profile };
+      const copyMarks = Object.fromEntries(items.map((key) => [key, element({ odinField: key })]));
+      return { ...container(Object.values(copyMarks)), marks: copyMarks };
     };
     const list = items ? itemList(template ? makeCopy : null) : null;
     const inside = [...Object.values(marks), ...(picture ? [picture] : []), ...(list ? [list] : [])];
@@ -138,89 +130,11 @@ test('fillSections refuses a list whose section has no items, or an item lacking
   }
 });
 
-test('an item with a photo and its description shows it, and an item with neither has the img removed', () => {
-  const people = { name: 'team', items: [
-    { title: 'First Person', text: 'About them.', image: 'first.webp', image_alt: 'First Person, their role' },
-    { title: 'Second Person', text: 'About them.' },
-  ] };
-  const { root, parts } = page([{ name: 'team', items: ['title', 'text', 'image'] }]);
-  fillSections(root, { sections: [people] }, { imageUrl });
-  const [first, second] = parts.team.list.copies;
-  assert.equal(first.photo.getAttribute('src'), 'https://images.example/first.webp');
-  assert.equal(first.photo.getAttribute('alt'), 'First Person, their role');
-  assert.equal(first.photo.removed, false);
-  assert.deepEqual([second.photo.removed, second.photo.getAttribute('src')], [true, null]);
-});
-
-test('an item with a photo and no description, or the other way round, is refused', () => {
-  for (const lacking of [{ image: 'first.webp', image_alt: '  ' }, { image: 'first.webp' }, { image_alt: 'First Person' }, { image: '', image_alt: 'First Person' }]) {
-    const { root } = page([{ name: 'team', items: ['title', 'image'] }]);
-    const people = { name: 'team', items: [{ title: 'First Person', text: 'About them.', ...lacking }] };
-    assert.throws(() => fillSections(root, { sections: [people] }, { imageUrl }), /an image without its description, or the other way round/, JSON.stringify(lacking));
-  }
-});
-
-test('an item\'s link goes on its name, and an item without one shows the name as plain text', () => {
-  const people = { name: 'team', link: 'https://example.com/the-section', items: [
-    { title: 'First Person', text: 'About them.', link: 'https://profiles.example/first' },
-    { title: 'Second Person', text: 'About them.' },
-    { title: 'Third Person', text: 'About them.', link: null },
-  ] };
-  const { root, parts } = page([{ name: 'team', items: ['title', 'link'] }]);
-  fillSections(root, { sections: [people] }, { imageUrl });
-  const [first, second, third] = parts.team.list.copies.map((copy) => copy.profile);
-  assert.equal(first.getAttribute('href'), 'https://profiles.example/first');
-  assert.equal(first.getAttribute('target'), '_blank');
-  for (const plain of [second, third]) {
-    assert.equal(plain.getAttribute('href'), null);
-    assert.equal('odinHref' in plain.dataset, false);
-    assert.deepEqual([plain.getAttribute('target'), plain.getAttribute('rel')], [null, null]);
-  }
-});
-
-test('an item\'s link that is not an https address is refused, not dropped', () => {
-  const { root } = page([{ name: 'team', items: ['title', 'link'] }]);
-  const people = { name: 'team', items: [{ title: 'First Person', text: 'About them.', link: 'http://profiles.example/first' }] };
-  assert.throws(() => fillSections(root, { sections: [people] }, { imageUrl }), /no usable value for: link/);
-});
-
-test('an item without a subtitle or note has those places removed, and an item with them shows them', () => {
-  const people = { name: 'team', items: [
-    { title: 'First Person', text: 'About them.', subtitle: 'Their role', note: 'Their degree' },
-    { title: 'Second Person', text: 'About them.', subtitle: null },
-  ] };
-  const { root, parts } = page([{ name: 'team', items: ['title', 'subtitle', 'note', 'text'] }]);
-  fillSections(root, { sections: [people] }, { imageUrl });
-  const [first, second] = parts.team.list.copies;
-  assert.deepEqual([first.marks.subtitle.textContent, first.marks.note.textContent], ['Their role', 'Their degree']);
-  assert.deepEqual([first.marks.subtitle.removed, first.marks.note.removed], [false, false]);
-  assert.deepEqual([second.marks.subtitle.removed, second.marks.note.removed], [true, true]);
-  assert.equal(second.marks.text.textContent, 'About them.');
-});
-
 test('an item must have its own title and text: the section\'s are never used in their place', () => {
   const { root } = page([{ name: 'team', items: ['title', 'text'] }]);
   const section = { name: 'team', title: 'The team', text: 'About the team.' };
   assert.throws(() => fillSections(root, { sections: [{ ...section, items: [{ text: 'About them.' }] }] }, { imageUrl }), /no usable value for: title/);
   assert.throws(() => fillSections(root, { sections: [{ ...section, items: [{ title: 'First Person' }] }] }, { imageUrl }), /no usable value for: text/);
-});
-
-test('a copy can show the section\'s action, a label every item shares', () => {
-  const people = { name: 'team', action: 'Example action', items: [{ title: 'First Person', text: 'About them.' }, { title: 'Second Person', text: 'About them.' }] };
-  const { root, parts } = page([{ name: 'team', items: ['title', 'action'] }]);
-  fillSections(root, { sections: [people] }, { imageUrl });
-  assert.deepEqual(parts.team.list.copies.map((copy) => [copy.marks.title.textContent, copy.marks.action.textContent]), [['First Person', 'Example action'], ['Second Person', 'Example action']]);
-});
-
-test('a copy that shows the section\'s action needs the section to have one', () => {
-  const { root } = page([{ name: 'team', items: ['title', 'action'] }]);
-  assert.throws(() => fillSections(root, { sections: [{ name: 'team', action: null, items: [{ title: 'First Person', text: 'About them.' }] }] }, { imageUrl }), /no usable value for: action/);
-});
-
-test('the label is the section\'s even when an item carries an action of its own', () => {
-  const { root, parts } = page([{ name: 'team', items: ['title', 'action'] }]);
-  fillSections(root, { sections: [{ name: 'team', action: 'Example action', items: [{ title: 'First Person', text: 'About them.', action: 'Another' }] }] }, { imageUrl });
-  assert.equal(parts.team.list.copies[0].marks.action.textContent, 'Example action');
 });
 
 test('fillSections refuses a list the markup gave no template', () => {

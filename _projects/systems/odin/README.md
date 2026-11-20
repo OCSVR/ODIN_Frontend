@@ -83,12 +83,7 @@ text with line breaks in it and the partner logo.
   - `data-odin-image` takes the section's image and its description.
   - `data-odin-items` marks a list. The `<template>` inside it is copied once
     per item of the section. In the template, `data-odin-field` takes the item's
-    `title`, `text`, `subtitle` or `note`. It can also take the section's
-    `action`, for a label every item shares. `data-odin-href="link"` takes the
-    item's link. `data-odin-image` takes the item's image and its description.
-    An item must have its `title` and `text`. The rest are optional: the place
-    for a missing `subtitle`, `note` or image is removed from that item's copy,
-    and a name whose item has no link shows as plain text.
+    `title` or `text`, and an item must have both.
 
   Anywhere inside the element handed to `showPage`, `data-odin-basic="<key>"`
   takes a site basic, such as `phone`. Add `data-odin-opens="tel"` or `"mailto"`
