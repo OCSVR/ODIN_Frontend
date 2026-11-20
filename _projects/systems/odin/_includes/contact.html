@@ -1,0 +1,31 @@
+{%- comment -%}
+  The contact block, shown on the home page and on the Contact Us page. Its heading, labels and
+  partner logo are the backend's contact page, and the phone number, email and address are the site
+  basics. The page that includes this loads both and hands them to showPage.
+{%- endcomment -%}
+<section class="ocs__card" id="contact">
+  <div class="ocs__split">
+    <div class="ocs__stack">
+      <div data-odin-section="details">
+        <h2 class="ocs__section-title" data-odin-field="title"></h2>
+      </div>
+      <p class="ocs__text" data-odin-section="phone">
+        <strong data-odin-field="title"></strong>
+        <a data-odin-basic="phone" data-odin-opens="tel"></a>
+      </p>
+      <p class="ocs__text" data-odin-section="email">
+        <strong data-odin-field="title"></strong>
+        <a data-odin-basic="email" data-odin-opens="mailto"></a>
+      </p>
+      <p class="ocs__text" data-odin-section="address">
+        <strong data-odin-field="title"></strong>
+        <span data-odin-basic="address"></span>
+      </p>
+    </div>
+    <div data-odin-section="details">
+      <a data-odin-href="link" target="_blank" rel="noopener noreferrer">
+        <img class="odin__partner" data-odin-image alt="">
+      </a>
+    </div>
+  </div>
+</section>

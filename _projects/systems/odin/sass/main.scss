@@ -196,6 +196,22 @@ $odin-rule: 1px solid var(--ui-border);
   object-fit: cover;
 }
 
+// A heading inside a card, where the site's size for an h2 would not fit a phone
+.odin__item-title {
+  font-size: 1.4rem;
+  line-height: 1.3;
+}
+
+// The partner's logo is white on a clear background. Blending it against what is behind it turns
+// it dark on a light theme, so it shows in every theme without a fixed color.
+.odin__partner {
+  width: 100%;
+  max-width: 14rem;
+  height: auto;
+  border-radius: 0;
+  mix-blend-mode: difference;
+}
+
 .odin__footer {
   border-top: $odin-rule;
   background: var(--panel);

@@ -133,17 +133,42 @@ test('the ODIN home page is the only page at the site root', () => {
 // A misspelled mark makes its page unavailable for every visitor, so the marks are checked here.
 const SECTION_PARTS = ['kicker', 'title', 'text', 'action'];
 
-test('each page names only parts the backend sends, and has all three state blocks', () => {
+test('each page has all three state blocks', () => {
   for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
     const markup = readFileSync(new URL(`pages/${name}`, system), 'utf8');
     const states = [...markup.matchAll(/data-odin-state="([^"]+)"/g)].map(([, state]) => state).sort();
     assert.deepEqual(states, ['loading', 'ready', 'unavailable'], `${name} does not have the three state blocks`);
-    const fields = [...markup.matchAll(/data-odin-field="([^"]+)"/g)].map(([, field]) => field);
-    assert.ok(fields.length > 0, `${name} marks no field`);
-    for (const field of fields) {
+  }
+});
+
+test('the pages and the contact block name only parts the backend sends', () => {
+  const files = [...readdirSync(new URL('pages/', system)).map((name) => `pages/${name}`), '_includes/contact.html'];
+  for (const name of files) {
+    const markup = readFileSync(new URL(name, system), 'utf8');
+    const marked = (attribute) => [...markup.matchAll(new RegExp(`${attribute}="([^"]+)"`, 'g'))].map(([, value]) => value);
+    assert.ok(marked('data-odin-field').length > 0, `${name} marks no field`);
+    for (const field of marked('data-odin-field')) {
       assert.ok([...SITE_FIELDS, ...SECTION_PARTS].includes(field), `${name} marks the field ${field}, which the backend does not send`);
     }
+    for (const basic of marked('data-odin-basic')) {
+      assert.ok(SITE_FIELDS.includes(basic), `${name} shows the site basic ${basic}, which the backend does not send`);
+    }
+    for (const opens of marked('data-odin-opens')) {
+      assert.ok(['tel', 'mailto'].includes(opens), `${name} asks for a ${opens} link, which page-view.js cannot make`);
+    }
+    for (const link of marked('data-odin-href')) {
+      assert.ok([...SITE_FIELDS, 'link'].includes(link), `${name} marks the link ${link}, which the backend does not send`);
+    }
   }
+});
+
+// The hero's button jumps to the contact block, which the home page includes.
+test('the home page includes the contact block that its button leads to', () => {
+  const home = readFileSync(new URL('pages/home.md', system), 'utf8');
+  const block = readFileSync(new URL('_includes/contact.html', system), 'utf8');
+  assert.match(home, /href="#contact"/);
+  assert.match(home, /\{% include projects\/odin\/contact\.html %\}/);
+  assert.match(block, /id="contact"/);
 });
 
 // The site is served under a base address (/ODIN_Frontend), so a link printed without it is broken.

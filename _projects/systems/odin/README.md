@@ -5,8 +5,9 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 copies them to the paths Jekyll reads.
 
 So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, the home page with its hero, and one
-page that checks the connection. The rest of the site's pages come in later tasks.
+scripts that read content from the backend, the home page, the contact block the
+home page shares with the Contact Us page, and one page that checks the
+connection. The About and Contact Us pages come in later tasks.
 
 ## Content comes from the backend
 
@@ -35,8 +36,8 @@ A page's main heading is an `h1`. Another project's stylesheet hides every `h1`
 on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
-start with `odin__`. Page content uses the shared OCS grammar. The hero adds a
-few `odin__` classes for its sizes.
+start with `odin__`. Page content uses the shared OCS grammar. The pages add a
+few `odin__` classes for sizes the grammar does not have.
 
 ## The scripts
 
@@ -58,10 +59,20 @@ few `odin__` classes for its sizes.
   and inside it:
   - `data-odin-field="<part>"` takes a part's text: `kicker`, `title`, `text` or
     `action`.
+  - `data-odin-href="link"` takes the section's link.
   - `data-odin-image` takes the section's image and its description.
+  - `data-odin-items` marks a list. The `<template>` inside it is copied once
+    per item of the section, and `data-odin-field` in the template takes the
+    item's `title` and `text`.
 
-  A part the markup asks for must be in the section with text in it, or the
-  whole page is unavailable.
+  Anywhere on the page, `data-odin-basic="<key>"` takes a site basic, such as
+  `phone`. Add `data-odin-opens="tel"` or `"mailto"` to make it a link that
+  opens the phone or email app. `load` resolves to `{ sections, site }`, and
+  `site` is only needed by a page that shows site basics.
+
+  A part the markup asks for must be there with text in it, or the whole page is
+  unavailable. Keep one section's element out of another's, because a section
+  fills every mark inside its element.
 - `js/site-frame.js` runs the header and footer: `startFrame` starts the phone
   menu, fills the parts marked `data-odin-frame` and picks the logos.
 
@@ -95,6 +106,9 @@ edit the sources here.
 | `_includes/` | `_includes/projects/odin/` |
 | `js/` | `assets/js/projects/odin/` |
 | `sass/main.scss` | `_sass/projects/odin/main.scss` |
+
+`_includes/contact.html` is the contact block. A page that includes it loads the
+backend's `contact` page and the site basics, as `pages/home.md` does.
 
 `pages/home.md` is the home page, at the site root. It took the place of the
 template's placeholder `index.md`, so keep the root free of another index page.
