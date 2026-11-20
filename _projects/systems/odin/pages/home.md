@@ -20,11 +20,11 @@ permalink: /
     <section class="ocs__card" data-odin-section="hero">
       <div class="ocs__split odin__row">
         <div>
-          <span class="ocs__badge" data-odin-field="kicker"></span>
+          <p class="ocs__lead" data-odin-field="kicker"></p>
           <h1 class="odin__title" data-odin-field="title"></h1>
           <p class="ocs__lead" data-odin-field="text"></p>
           <div class="ocs__links">
-            <a class="ocs__btn large pill accent fill" href="#contact" data-odin-field="action"></a>
+            <a class="ocs__btn large accent fill pill" href="#contact" data-odin-field="action"></a>
           </div>
         </div>
         <div class="ocs__image-frame ocs__image-frame--cover odin__photo">
@@ -34,12 +34,12 @@ permalink: /
     </section>
 
     <section class="ocs__card" data-odin-section="statistics">
-      <h2 class="ocs__section-title" data-odin-field="title"></h2>
+      <h2 data-odin-field="title"></h2>
       <div class="ocs__stats odin__stats" data-odin-items>
         <template>
-          <div class="ocs__stat">
+          <div>
             <span class="ocs__stat-value" data-odin-field="title"></span>
-            <span class="ocs__stat-label" data-odin-field="text"></span>
+            <p class="ocs__text" data-odin-field="text"></p>
           </div>
         </template>
       </div>
@@ -50,14 +50,11 @@ permalink: /
         <div class="ocs__image-frame ocs__image-frame--cover odin__photo odin__photo--product">
           <img data-odin-image alt="">
         </div>
-        <div class="ocs__keypoints" data-odin-items>
+        <div class="ocs__stack" data-odin-items>
           <template>
-            <div class="ocs__keypoint">
-              <span class="ocs__check" aria-hidden="true">&#10003;</span>
-              <div>
-                <strong data-odin-field="title"></strong>
-                <p class="ocs__text" data-odin-field="text"></p>
-              </div>
+            <div>
+              <h3 data-odin-field="title"></h3>
+              <p class="ocs__text" data-odin-field="text"></p>
             </div>
           </template>
         </div>
@@ -67,7 +64,7 @@ permalink: /
     <section class="ocs__card" data-odin-section="how_it_works">
       <div class="ocs__split odin__row">
         <div>
-          <h2 class="odin__heading" data-odin-field="title"></h2>
+          <h2 data-odin-field="title"></h2>
           <p class="ocs__lead" data-odin-field="text"></p>
         </div>
         <div class="ocs__image-frame ocs__image-frame--cover odin__photo odin__photo--strip">
@@ -78,11 +75,12 @@ permalink: /
 
     <div class="ocs__card">
       <section data-odin-section="pitch">
-        <h2 class="odin__heading" data-odin-field="title"></h2>
+        <h2 data-odin-field="title"></h2>
         <p class="ocs__lead" data-odin-field="text"></p>
       </section>
-      <section class="ocs__callout" data-odin-section="fda">
-        <h2 class="ocs__section-title" data-odin-field="title"></h2>
+      <hr>
+      <section data-odin-section="fda">
+        <h3 class="ocs__section-title" data-odin-field="title"></h3>
         <p class="ocs__text" data-odin-field="text"></p>
       </section>
     </div>

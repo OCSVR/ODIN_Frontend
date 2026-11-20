@@ -1,30 +1,28 @@
 {%- comment -%}
-  The ODIN footer: the last card on every ODIN page. The logo, tagline, social link addresses and
+  The ODIN footer, at the end of every ODIN page. The logo, tagline, social link addresses and
   copyright line come from the backend, and each part that shows them stays hidden until they
   arrive. The two lists of links are odin.footer_nav and odin.social in _config.yml.
 {%- endcomment -%}
 <footer class="ocs__container ocs__container--fill">
-  <div class="ocs__card">
-    <div class="ocs__card-header">
-      <div class="ocs__stack" data-odin-frame hidden>
-        <a href="{{ '/' | relative_url }}">
-          <img class="odin__logo" data-odin-logo alt="">
-        </a>
-        <p class="ocs__text" data-odin-field="tagline"></p>
-      </div>
-      <nav class="ocs__links" aria-label="{{ site.odin.footer_nav.title | escape }}">
-        {%- for item in site.odin.footer_nav.items %}
-        <a class="ocs__btn small pill" href="{{ item.url | relative_url }}">{{ item.title | escape }}</a>
-        {%- endfor %}
-      </nav>
+  <div class="ocs__capstone-footer">
+    <div class="ocs__stack" data-odin-frame hidden>
+      <a href="{{ '/' | relative_url }}">
+        <img class="odin__logo" data-odin-logo alt="">
+      </a>
+      <p class="ocs__text" data-odin-field="tagline"></p>
     </div>
-    <div class="ocs__capstone-footer" data-odin-frame hidden>
-      <p class="ocs__text" data-odin-field="copyright"></p>
-      <div class="ocs__links">
-        {%- for item in site.odin.social %}
-        <a class="ocs__btn small pill" data-odin-href="{{ item.field }}" target="_blank" rel="noopener noreferrer">{{ item.title | escape }}</a>
-        {%- endfor %}
-      </div>
+    <nav class="ocs__links" aria-label="{{ site.odin.footer_nav.title | escape }}">
+      {%- for item in site.odin.footer_nav.items %}
+      <a class="ocs__btn small pill" href="{{ item.url | relative_url }}">{{ item.title | escape }}</a>
+      {%- endfor %}
+    </nav>
+  </div>
+  <div class="ocs__capstone-footer" data-odin-frame hidden>
+    <p class="ocs__text" data-odin-field="copyright"></p>
+    <div class="ocs__links">
+      {%- for item in site.odin.social %}
+      <a class="ocs__btn small pill" data-odin-href="{{ item.field }}" target="_blank" rel="noopener noreferrer">{{ item.title | escape }}</a>
+      {%- endfor %}
     </div>
   </div>
 </footer>

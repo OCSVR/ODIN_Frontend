@@ -14,8 +14,9 @@
 #   in _config.yml. It will appear in your document head meta (for Google search
 #   results) and in your feed.xml site description.
 
+# The shared head puts the title in every browser tab. No description is set: the shared head
+# would print it on every page, and the site's own words come from the backend.
 title: ODIN Diagnostics
-description: "Website for ODIN Diagnostics, built on the OCS portfolio template."
 owner_name: John Mortensen
 github_username: OCSVR
 github_repo: "ODIN_Frontend"
@@ -25,8 +26,8 @@ future: true
 # Spring, and the analytics tracker is not loaded.
 spring: false
 
-# The ODIN Diagnostics website's menus, drawn by the header and footer in _projects/systems/odin/_includes.
-# To add a page to a menu, add a line here: no HTML changes.
+# The lists the ODIN footer draws, in _projects/systems/odin/_includes/footer.html. To add a link,
+# add a line here: no HTML changes. The site menu in the top bar is minima.nav_pages, further down.
 odin:
   # The footer's social links. The backend gives the address for each, in the field named here.
   social:

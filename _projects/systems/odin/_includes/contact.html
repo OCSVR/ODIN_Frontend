@@ -5,25 +5,24 @@
 {%- endcomment -%}
 <div class="ocs__card" id="contact">
   <div data-odin-section="details">
-    <h2 class="ocs__section-title" data-odin-field="title"></h2>
+    <h2 data-odin-field="title"></h2>
   </div>
-  <div class="ocs__split">
-    {%- comment %} The links stay on the card's own background: on a tinted panel their color is too faint in some themes. {% endcomment %}
+  <div class="ocs__split odin__row">
     <div class="ocs__stack">
-      <div class="ocs__team" data-odin-section="phone">
-        <span class="ocs__team-label" data-odin-field="title"></span>
-        <span class="ocs__team-name"><a data-odin-basic="phone" data-odin-opens="tel"></a></span>
-      </div>
-      <div class="ocs__team" data-odin-section="email">
-        <span class="ocs__team-label" data-odin-field="title"></span>
-        <span class="ocs__team-name"><a data-odin-basic="email" data-odin-opens="mailto"></a></span>
-      </div>
-      <div class="ocs__team" data-odin-section="address">
-        <span class="ocs__team-label" data-odin-field="title"></span>
-        <span class="ocs__team-name" data-odin-basic="address"></span>
-      </div>
+      <p class="ocs__text" data-odin-section="phone">
+        <strong data-odin-field="title"></strong>
+        <a data-odin-basic="phone" data-odin-opens="tel"></a>
+      </p>
+      <p class="ocs__text" data-odin-section="email">
+        <strong data-odin-field="title"></strong>
+        <a data-odin-basic="email" data-odin-opens="mailto"></a>
+      </p>
+      <p class="ocs__text" data-odin-section="address">
+        <strong data-odin-field="title"></strong>
+        <span data-odin-basic="address"></span>
+      </p>
     </div>
-    <div class="ocs__visual" data-odin-section="details">
+    <div data-odin-section="details">
       <a data-odin-href="link" target="_blank" rel="noopener noreferrer">
         <img class="odin__partner" data-odin-image data-odin-backdrop alt="">
       </a>

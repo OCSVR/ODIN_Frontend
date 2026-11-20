@@ -48,20 +48,19 @@
   letter-spacing: -0.02em;
 }
 
-// A section's heading where it is a sentence of its own, larger than ocs__section-title's label
-.odin__heading {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
-  line-height: 1.2;
-}
-
 // Words beside a photo sit level with its middle
 .ocs__split.odin__row {
   align-items: center;
 }
 
-// A photo's shape is set here, so the page does not jump when the photo arrives
-.odin__photo {
+// A photo's frame. Its shape is set here, so the page does not jump when the photo arrives. Its
+// width is set too: in a row that stretches its sides the shape would be worked out from the
+// height, and a tall column of words would push the frame out of its own column.
+.ocs__image-frame.odin__photo {
+  align-self: start;
+  width: 100%;
+  // The shared cover frame has no padding, but its phone rule comes later and gives some back
+  padding: 0;
   aspect-ratio: 3 / 2;
 
   &--product {
@@ -77,8 +76,13 @@
   }
 }
 
-// Four numbers in a row on a wide screen, two on a narrower one. On a phone ocs__stats already
-// puts them in one column.
+.odin__row .odin__photo {
+  align-self: center;
+}
+
+// Four numbers in a row on a wide screen and two on a narrower one. ocs__stats alone fits in as
+// many columns as it can, and between a phone and a wide screen those are too narrow for a long
+// figure, which then breaks in the middle. On a phone it already puts them in one column.
 @media (min-width: 521px) {
   .ocs__stats.odin__stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -111,7 +115,7 @@
 .odin__partner {
   display: block;
   width: 100%;
-  max-width: 14rem;
+  max-width: 9rem;
   height: auto;
   margin: 0 auto;
   aspect-ratio: 1 / 1;

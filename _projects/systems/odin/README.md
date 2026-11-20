@@ -12,10 +12,12 @@ page that checks the connection.
 ## Content comes from the backend
 
 The website's text, numbers and images belong in the Flask backend, and pages
-load them from its API. Keep them out of this folder. Three kinds of words do
-live here: the menus in `_config.yml`, each page's `title` in its front matter
-(the browser tab's label and the page's entry in the top bar), and the loading
-and error messages.
+load them from its API. Keep them out of this folder. These words do live in
+the frontend: the menus and the site's `title` in `_config.yml`, each page's
+`title` in its front matter (the browser tab's label and the page's entry in the
+top bar), and the loading and error messages. The logo in the top bar is the
+template's own `images/logo.png`. It belongs to the shared frame, and ODIN's own
+logo comes from the backend.
 
 ## The layout and the menus
 
@@ -47,17 +49,17 @@ A page's main heading is an `h1`. Another project's stylesheet hides every `h1`
 on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
 Pages are built from the shared OCS grammar in `_sass/open-coding/elements`:
-each block is an `ocs__card`, with `ocs__badge`, `ocs__lead` and
-`ocs__section-title` for its words, `ocs__split` and `ocs__visual` for two
-panels side by side, `ocs__stat`, `ocs__keypoints` and `ocs__team` for numbers,
-points and labelled values, and `ocs__image-frame` for photos. Reach for one of
-these before writing a style.
+each block is an `ocs__card`, with `ocs__lead` and `ocs__text` for its words,
+`ocs__split` for words beside a photo, `ocs__stats` for numbers,
+`ocs__image-frame` for photos and `ocs__btn` for buttons. Reach for one of these
+before writing a style. Keep to one box per block: a card holds headings, text
+and photos, and no smaller boxes.
 
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
 start with `odin__`. It holds only what the frame and the grammar lack: the
-page's width, the size of a page's main heading and of a section heading that is
-a sentence, the shapes of the photos, four numbers in one row, the logo's size,
-text with line breaks in it and the partner logo.
+page's width, the size of a page's main heading, the shapes of the photos, four
+numbers in one row, the logo's size, text with line breaks in it and the partner
+logo.
 
 ## The scripts
 
@@ -152,7 +154,7 @@ template's placeholder `index.md`, so keep the root free of another index page.
 
 `pages/connection.md` is the connection check. Its permalink is
 `/odin/connection/`, which `baseurl` puts at `/ODIN_Frontend/odin/connection/`.
-It is for the team and is left out of the menu and of search.
+It is for the team and is left out of the menu and of the site's own search.
 
 The system is registered as `systems/odin:dev` in `_projects/.makeprojects` and
 uses the generated Makefile.

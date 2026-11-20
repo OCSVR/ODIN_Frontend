@@ -106,9 +106,18 @@ test('the three site pages ask the shared layout for the full width', () => {
 // the bar without a word.
 test('the site menu in _config.yml lists ODIN pages that exist, with the home page first', () => {
   const config = readFileSync(new URL('_config.yml', root), 'utf8');
-  const [, list] = config.match(/\n  nav_pages:\n((?:    - \S+\n)+)/) || [];
-  assert.ok(list, '_config.yml has no minima.nav_pages list');
-  const paths = list.trim().split('\n').map((line) => line.replace(/^\s*- /, ''));
+  const start = config.indexOf('\n  nav_pages:\n');
+  assert.ok(start >= 0, '_config.yml has no minima.nav_pages list');
+  // The list is every line indented under nav_pages. One written in a form this test cannot read
+  // fails here, so no entry goes unchecked.
+  const lines = config.slice(start + '\n  nav_pages:\n'.length).split('\n');
+  const entries = lines.slice(0, lines.findIndex((line) => !line.startsWith('    ')));
+  assert.ok(entries.length > 0, 'the site menu is empty');
+  const paths = entries.map((line) => {
+    const [, path] = line.match(/^    - (\S+)$/) || [];
+    assert.ok(path, `this test cannot read the menu entry "${line}"`);
+    return path;
+  });
   const pagesFolder = distribution().find(({ source }) => source === 'pages').destination;
   for (const path of paths) {
     assert.ok(path.startsWith(`${pagesFolder}/`), `the menu entry ${path} is not an ODIN page`);
@@ -206,6 +215,13 @@ test('the pages and the contact block name only parts the backend sends', () => 
       assert.ok([...SITE_FIELDS, 'link'].includes(link), `${name} marks the link ${link}, which the backend does not send`);
     }
   }
+});
+
+// The team asked that the site not list its people.
+test('the About page lists no team', () => {
+  const about = readFileSync(new URL('pages/about.md', system), 'utf8');
+  assert.ok(!about.includes('data-odin-items'), 'pages/about.md holds a list');
+  assert.ok(!about.includes('data-odin-section="team"'), 'pages/about.md marks the team section');
 });
 
 // A menu entry with no page behind it is a dead link on every page of the site.
