@@ -18,10 +18,15 @@ $odin-rule: 1px solid var(--ui-border);
     display: none;
   }
 
-  // Other stylesheets on the site hide every h1 and give it a green glow. ODIN pages have one h1
-  // each, in the theme's text color.
+  // Other stylesheets on the site hide every h1, give it a green glow, and color h2 and h3 with
+  // fixed colors. ODIN pages have one h1 each, and their headings take the theme's text color.
   h1 {
     display: block;
+  }
+
+  h1,
+  h2,
+  h3 {
     color: var(--pref-text-color);
     text-shadow: none;
   }
