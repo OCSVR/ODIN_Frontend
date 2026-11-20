@@ -1,0 +1,24 @@
+---
+layout: opencs
+---
+{%- comment -%}
+  The frame of every ODIN Diagnostics page. It is the OCS frame itself: the shared opencs layout
+  gives the head, the top bar with the site menu and sign-in, and the page column. This layout adds
+  ODIN's footer and the script that fills the parts the backend sends. The menu is the OCS one,
+  minima.nav_pages in _config.yml.
+{%- endcomment -%}
+<div class="odin">
+  {{ content }}
+  {%- include projects/odin/footer.html -%}
+</div>
+<script type="module">
+  // Jekyll fills in the site's baseurl here. The odin modules are handed the Flask backend, so
+  // they never import config.js themselves.
+  import { fetchOptions, pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { Backend } from '{{ site.baseurl }}/assets/js/login/backend.js';
+  import { createContent } from '{{ site.baseurl }}/assets/js/projects/odin/content.js';
+  import { startFrame } from '{{ site.baseurl }}/assets/js/projects/odin/site-frame.js';
+
+  const content = createContent(new Backend(pythonURI, fetchOptions));
+  startFrame({ root: document, load: () => content.site(), imageUrl: content.imageUrl });
+</script>

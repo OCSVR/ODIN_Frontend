@@ -14,13 +14,30 @@
 #   in _config.yml. It will appear in your document head meta (for Google search
 #   results) and in your feed.xml site description.
 
-title: Open Coding 
-description: "Class of 2026"
+# The shared head puts the title in every browser tab. No description is set: the shared head
+# would print it on every page, and the site's own words come from the backend.
+title: ODIN Diagnostics
 owner_name: John Mortensen
-github_username: jm1021 
-github_repo: "portfolio" 
-baseurl: "/portfolio" 
+github_username: OCSVR
+github_repo: "ODIN_Frontend"
+baseurl: "/ODIN_Frontend"
 future: true
+# ODIN has a Flask backend only. With this false, login, logout, the navbar and /profile skip
+# Spring, and the analytics tracker is not loaded.
+spring: false
+
+# The lists the ODIN footer draws, in _projects/systems/odin/_includes/footer.html. To add a link,
+# add a line here: no HTML changes. The site menu in the top bar is minima.nav_pages, further down.
+odin:
+  # The footer's social links. The backend gives the address for each, in the field named here.
+  social:
+    - { title: "Instagram", field: "instagram" }
+    - { title: "LinkedIn", field: "linkedin" }
+  footer_nav:
+    title: "Useful Links"
+    items:
+      - { title: "About", url: "/about/" }
+      - { title: "Contact", url: "/contact/" }
 
 # Build settings
 # --------------
@@ -110,5 +127,6 @@ minima:
     - { platform: x, user_url: "https://x.com/Open_Coding" }
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
-    - navigation/projects/topics/topics.md
-    - navigation/about.md
+    - navigation/projects/odin/home.md
+    - navigation/projects/odin/about.md
+    - navigation/projects/odin/contact.md
