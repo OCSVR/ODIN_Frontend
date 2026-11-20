@@ -26,11 +26,35 @@ function fillImages(element, section, imageUrl) {
   }
 }
 
-// Puts an item's image into each place its copy marks for it. An item may have no image, such as
-// a person without a photo, and then the place is taken out of the copy.
+// The parts of an item the backend may leave out. A copy shows an item without them.
+const OPTIONAL_ITEM_FIELDS = ['subtitle', 'note'];
+
+// Takes out of a copy the places for optional parts its item does not have: the element for a
+// missing subtitle or note, and the link around a name when the item has no link, which leaves
+// the name as plain text.
+function dropMissingParts(copy, item) {
+  for (const element of copy.querySelectorAll('[data-odin-field]')) {
+    const key = element.dataset.odinField;
+    if (OPTIONAL_ITEM_FIELDS.includes(key) && (item[key] === null || item[key] === undefined)) element.remove();
+  }
+  for (const link of copy.querySelectorAll('[data-odin-href]')) {
+    const key = link.dataset.odinHref;
+    if (item[key] === null || item[key] === undefined) {
+      delete link.dataset.odinHref;
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+    }
+  }
+}
+
+// Puts an item's image into each place its copy marks for it. An item's image is optional: a
+// person may have no photo yet, and then the img is removed from the copy. An image without its
+// description, or the other way round, is a fault in the content.
 function fillItemImages(copy, item, imageUrl) {
   for (const image of copy.querySelectorAll('[data-odin-image]')) {
-    if (isText(item.image) && isText(item.image_alt)) {
+    const has = [isText(item.image), isText(item.image_alt)];
+    if (has[0] !== has[1]) throw new Error(`An item of the list has an image without its description, or the other way round`);
+    if (has[0]) {
       image.setAttribute('src', imageUrl(item.image));
       image.setAttribute('alt', item.image_alt);
     } else {
@@ -40,8 +64,8 @@ function fillItemImages(copy, item, imageUrl) {
 }
 
 // Fills each list marked data-odin-items: its <template> is copied once per item of the section,
-// and each copy takes that item's parts. A copy can also show the section's `action`, the words on
-// a control every item has.
+// and each copy takes that item's parts. A copy can also show the section's `action`, for a label
+// every item shares, such as the one that opens each person's bio.
 function fillItems(element, section, imageUrl) {
   for (const list of element.querySelectorAll('[data-odin-items]')) {
     const template = list.querySelector('template');
@@ -51,7 +75,9 @@ function fillItems(element, section, imageUrl) {
     }
     const copies = section.items.map((item) => {
       const copy = template.content.cloneNode(true);
-      fillFields(copy, { action: section.action, ...item });
+      dropMissingParts(copy, item);
+      // Only the label comes from the section. Every other part must be the item's own.
+      fillFields(copy, { ...item, action: section.action });
       fillItemImages(copy, item, imageUrl);
       return copy;
     });

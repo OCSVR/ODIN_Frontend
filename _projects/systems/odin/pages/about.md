@@ -27,16 +27,16 @@ permalink: /about/
 
       <section data-odin-section="team">
         <h2 class="ocs__section-title" data-odin-field="title"></h2>
-        <div class="ocs__stack ocs__stack--wide" data-odin-items>
+        <div data-odin-items>
           <template>
             <article class="ocs__card">
-              <img class="odin__portrait" data-odin-image alt="">
+              <img class="ocs__image-frame ocs__image-frame--thumbnail" data-odin-image alt="">
               <h3><a data-odin-href="link" data-odin-field="title" target="_blank" rel="noopener noreferrer"></a></h3>
-              <p class="ocs__text" data-odin-field="subtitle"></p>
+              <p class="ocs__text odin__lines" data-odin-field="subtitle"></p>
               <p class="ocs__text odin__lines" data-odin-field="note"></p>
               <details>
                 <summary data-odin-field="action"></summary>
-                <p class="ocs__text" data-odin-field="text"></p>
+                <p class="ocs__text odin__lines" data-odin-field="text"></p>
               </details>
             </article>
           </template>

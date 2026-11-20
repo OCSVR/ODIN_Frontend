@@ -12,7 +12,10 @@ page that checks the connection.
 ## Content comes from the backend
 
 The website's text, numbers and images belong in the Flask backend, and pages
-load them from its API. Keep them out of this folder.
+load them from its API. Keep them out of this folder. Three kinds of words do
+live here: the menus in `_config.yml`, each page's `title` in its front matter
+(the browser tab's label, the same word as its menu entry), and the loading and
+error messages.
 
 ## The layout and the menus
 
@@ -38,7 +41,7 @@ on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
 start with `odin__`. Page content uses the shared OCS grammar. The pages add a
 few `odin__` classes where the grammar has none: the hero's sizes, text with line
-breaks in it, a person's photo and the partner logo.
+breaks in it and the partner logo.
 
 ## The scripts
 
@@ -64,10 +67,12 @@ breaks in it, a person's photo and the partner logo.
   - `data-odin-image` takes the section's image and its description.
   - `data-odin-items` marks a list. The `<template>` inside it is copied once
     per item of the section. In the template, `data-odin-field` takes the item's
-    `title`, `text`, `subtitle` or `note`, and also the section's `action` (the
-    words on a control every item has). `data-odin-href="link"` takes the item's
-    link. `data-odin-image` takes the item's image, and is taken out of the copy
-    for an item that has none, such as a person without a photo.
+    `title`, `text`, `subtitle` or `note`. It can also take the section's
+    `action`, for a label every item shares. `data-odin-href="link"` takes the
+    item's link. `data-odin-image` takes the item's image and its description.
+    An item must have its `title` and `text`. The rest are optional: the place
+    for a missing `subtitle`, `note` or image is removed from that item's copy,
+    and a name whose item has no link shows as plain text.
 
   Anywhere inside the element handed to `showPage`, `data-odin-basic="<key>"`
   takes a site basic, such as `phone`. Add `data-odin-opens="tel"` or `"mailto"`
@@ -97,8 +102,9 @@ page needs all three blocks. Put each state on a plain `div`, because a class
 that sets `display` would override the `hidden` attribute. Give the element
 around the loading and unavailable blocks `role="status"`, so a screen reader
 announces those two messages. Keep the ready block outside it, or the whole page
-is read out as one announcement. On the home page all three start hidden, so a
-visitor without JavaScript sees only the note that the page needs it.
+is read out as one announcement. On the home, About and Contact Us pages all
+three start hidden, so a visitor without JavaScript sees only the note that the
+page needs it.
 
 ## Resources
 
@@ -122,7 +128,9 @@ backend's `contact` page and the site basics, as `pages/home.md` and
 `pages/contact.md` do.
 
 `pages/about.md` is the About page, at `/about/`: the title, the mission and the
-team. It took the place of the template's own `navigation/about.md`.
+team. It took the place of the template's own `navigation/about.md`, which was
+removed with its photos in `images/about/` and its `nav_pages` entry in
+`_config.yml`. Keep that file from coming back, or two pages claim `/about/`.
 
 `pages/contact.md` is the Contact Us page, at `/contact/`: the page's title and
 the line under it, then the contact block.

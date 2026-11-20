@@ -153,9 +153,14 @@ test('the pages and the contact block name only parts the backend sends', () => 
     assert.ok(marked('data-odin-field').length > 0, `${name} marks no field`);
     // Only the connection check shows the site basics as fields. A page built from sections shows
     // them with data-odin-basic, because a field inside a section's element is one of its parts.
-    const fields = name === 'pages/connection.md' ? SITE_FIELDS : [...SECTION_PARTS, ...ITEM_PARTS];
+    const fields = name === 'pages/connection.md' ? SITE_FIELDS : SECTION_PARTS;
+    // An item's own parts are only filled inside a list's template
+    const outside = markup.replace(/<template>[\s\S]*?<\/template>/g, '');
+    for (const field of [...outside.matchAll(/data-odin-field="([^"]+)"/g)].map(([, value]) => value)) {
+      assert.ok(fields.includes(field), `${name} marks the field ${field} outside a list, where it would not be given`);
+    }
     for (const field of marked('data-odin-field')) {
-      assert.ok(fields.includes(field), `${name} marks the field ${field}, which it would not be given`);
+      assert.ok([...fields, ...ITEM_PARTS].includes(field), `${name} marks the field ${field}, which it would not be given`);
     }
     for (const section of marked('data-odin-section')) {
       assert.ok(BACKEND_SECTIONS.includes(section), `${name} marks the section ${section}, which no backend page has`);
@@ -179,9 +184,33 @@ test('every page in the ODIN menus exists, at the address the menu gives', () =>
   const menu = [...block.matchAll(/^\s+- \{ title: "([^"]+)", url: "([^"]+)" \}$/gm)].map(([, title, url]) => ({ title, url }));
   const permalinks = readdirSync(new URL('pages/', system))
     .map((name) => readFileSync(new URL(`pages/${name}`, system), 'utf8').match(/^permalink: (\S+)$/m)?.[1]);
-  assert.ok(menu.length >= 3, 'the ODIN menus list fewer than three entries');
+  // Every entry of the two menus must be one this test could read, or a dead link written another
+  // way would pass. The social links are entries too, with a field in place of an address.
+  const entries = block.slice(0, block.indexOf('\n\n')).split('\n').filter((line) => /^\s+- /.test(line));
+  const social = entries.filter((line) => /field: /.test(line));
+  assert.equal(menu.length, entries.length - social.length, 'a menu entry is written in a form this test cannot read');
   for (const { title, url } of menu) {
     assert.ok(permalinks.includes(url), `the menu entry ${title} leads to ${url}, which no ODIN page has`);
+  }
+});
+
+// Two pages with one address would leave it to chance which one the site shows.
+test('no two ODIN pages share an address, and the template\'s own About page stays removed', () => {
+  const permalinks = readdirSync(new URL('pages/', system))
+    .map((name) => readFileSync(new URL(`pages/${name}`, system), 'utf8').match(/^permalink: (\S+)$/m)?.[1]);
+  assert.equal(new Set(permalinks).size, permalinks.length, `two ODIN pages share an address: ${permalinks.join(' ')}`);
+  assert.ok(!existsSync(new URL('navigation/about.md', root)), 'navigation/about.md would also claim /about/');
+});
+
+// Each page asks the backend for its own content. A page that asked for another's would be unavailable.
+test('each page loads the backend pages whose sections it shows', () => {
+  const loads = (name) => [...readFileSync(new URL(`pages/${name}`, system), 'utf8').matchAll(/content\.(page\('(\w+)'\)|site\(\))/g)]
+    .map(([, call, page]) => page ?? 'site').sort();
+  assert.deepEqual(loads('home.md'), ['contact', 'home', 'site']);
+  assert.deepEqual(loads('about.md'), ['about']);
+  assert.deepEqual(loads('contact.md'), ['contact', 'site']);
+  for (const name of ['home.md', 'contact.md']) {
+    assert.match(readFileSync(new URL(`pages/${name}`, system), 'utf8'), /\{% include projects\/odin\/contact\.html %\}/, `${name} does not include the contact block`);
   }
 });
 

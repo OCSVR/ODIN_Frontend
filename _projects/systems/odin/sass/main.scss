@@ -208,13 +208,6 @@ $odin-rule: 1px solid var(--ui-border);
   white-space: pre-line;
 }
 
-// A person's photo on the About page. The photos are square.
-.odin__portrait {
-  width: 8rem;
-  height: auto;
-  aspect-ratio: 1 / 1;
-}
-
 // The partner's logo is white on a clear background, so a light theme would hide it. The script
 // says whether what is behind it is light, and then the logo is turned dark.
 .odin__partner {
