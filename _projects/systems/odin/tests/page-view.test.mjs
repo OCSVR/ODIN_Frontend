@@ -20,8 +20,10 @@ function page(sections = [{ name: 'hero', fields: ['kicker', 'title'], image: tr
     const marks = Object.fromEntries(fields.map((key) => [key, element({ odinField: key })]));
     const picture = image ? element({ odinImage: '' }) : null;
     const makeCopy = () => {
-      const copyMarks = Object.fromEntries(items.map((key) => [key, element({ odinField: key })]));
-      return { ...container(Object.values(copyMarks)), marks: copyMarks };
+      const copyMarks = Object.fromEntries(items.filter((key) => key !== 'image').map((key) => [key, element({ odinField: key })]));
+      // An image mark in a copy can be taken out of it, as a browser's remove() does
+      const photo = items.includes('image') ? { ...element({ odinImage: '' }), removed: false, remove() { photo.removed = true; } } : null;
+      return { ...container([...Object.values(copyMarks), ...(photo ? [photo] : [])]), marks: copyMarks, photo };
     };
     const list = items ? itemList(template ? makeCopy : null) : null;
     const inside = [...Object.values(marks), ...(picture ? [picture] : []), ...(list ? [list] : [])];
@@ -128,6 +130,34 @@ test('fillSections refuses a list whose section has no items, or an item lacking
     assert.throws(() => fillSections(root, { sections: [{ ...FACTS, items }] }, { imageUrl }), message, JSON.stringify(items));
     assert.deepEqual(parts.facts.list.copies, []);
   }
+});
+
+test('an item with a photo gets it, and an item without one has the place taken out', () => {
+  const people = { name: 'team', items: [
+    { title: 'First Person', text: 'About them.', image: 'first.webp', image_alt: 'First Person, their role' },
+    { title: 'Second Person', text: 'About them.' },
+    { title: 'Third Person', text: 'About them.', image: 'third.webp', image_alt: '  ' },
+  ] };
+  const { root, parts } = page([{ name: 'team', items: ['title', 'text', 'image'] }]);
+  fillSections(root, { sections: [people] }, { imageUrl });
+  const [first, second, third] = parts.team.list.copies;
+  assert.equal(first.photo.getAttribute('src'), 'https://images.example/first.webp');
+  assert.equal(first.photo.getAttribute('alt'), 'First Person, their role');
+  assert.equal(first.photo.removed, false);
+  assert.deepEqual([second.photo.removed, second.photo.getAttribute('src')], [true, null]);
+  assert.deepEqual([third.photo.removed, third.photo.getAttribute('src')], [true, null]);
+});
+
+test('a copy can show the section\'s action, the words on a control every item has', () => {
+  const people = { name: 'team', action: 'Example action', items: [{ title: 'First Person', text: 'About them.' }, { title: 'Second Person', text: 'About them.' }] };
+  const { root, parts } = page([{ name: 'team', items: ['title', 'action'] }]);
+  fillSections(root, { sections: [people] }, { imageUrl });
+  assert.deepEqual(parts.team.list.copies.map((copy) => [copy.marks.title.textContent, copy.marks.action.textContent]), [['First Person', 'Example action'], ['Second Person', 'Example action']]);
+});
+
+test('a copy that shows the section\'s action needs the section to have one', () => {
+  const { root } = page([{ name: 'team', items: ['title', 'action'] }]);
+  assert.throws(() => fillSections(root, { sections: [{ name: 'team', action: null, items: [{ title: 'First Person', text: 'About them.' }] }] }, { imageUrl }), /no usable value for: action/);
 });
 
 test('fillSections refuses a list the markup gave no template', () => {

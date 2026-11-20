@@ -26,9 +26,23 @@ function fillImages(element, section, imageUrl) {
   }
 }
 
+// Puts an item's image into each place its copy marks for it. An item may have no image, such as
+// a person without a photo, and then the place is taken out of the copy.
+function fillItemImages(copy, item, imageUrl) {
+  for (const image of copy.querySelectorAll('[data-odin-image]')) {
+    if (isText(item.image) && isText(item.image_alt)) {
+      image.setAttribute('src', imageUrl(item.image));
+      image.setAttribute('alt', item.image_alt);
+    } else {
+      image.remove();
+    }
+  }
+}
+
 // Fills each list marked data-odin-items: its <template> is copied once per item of the section,
-// and each copy takes that item's parts.
-function fillItems(element, section) {
+// and each copy takes that item's parts. A copy can also show the section's `action`, the words on
+// a control every item has.
+function fillItems(element, section, imageUrl) {
   for (const list of element.querySelectorAll('[data-odin-items]')) {
     const template = list.querySelector('template');
     if (!template) throw new Error(`The ${section.name} list has no template`);
@@ -37,7 +51,8 @@ function fillItems(element, section) {
     }
     const copies = section.items.map((item) => {
       const copy = template.content.cloneNode(true);
-      fillFields(copy, item);
+      fillFields(copy, { action: section.action, ...item });
+      fillItemImages(copy, item, imageUrl);
       return copy;
     });
     list.replaceChildren(template, ...copies);
@@ -88,7 +103,7 @@ export function fillSections(root, { sections, site }, { imageUrl }) {
     if (!section) throw new Error(`The page has no content for its ${name} section`);
     fillFields(element, section);
     fillImages(element, section, imageUrl);
-    fillItems(element, section);
+    fillItems(element, section, imageUrl);
   }
   fillBasics(root, site);
 }
