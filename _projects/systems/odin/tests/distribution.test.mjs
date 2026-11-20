@@ -132,8 +132,10 @@ test('the ODIN home page is the only page at the site root', () => {
 
 // A misspelled mark makes its page unavailable for every visitor, so the marks are checked here.
 const SECTION_PARTS = ['kicker', 'title', 'text', 'action'];
+// The other parts an item of a list can have
+const ITEM_PARTS = ['subtitle', 'note'];
 // The sections the backend's pages have, by name. A page may only mark one of these.
-const BACKEND_SECTIONS = ['hero', 'statistics', 'features', 'how_it_works', 'pitch', 'fda', 'intro', 'details', 'phone', 'email', 'address'];
+const BACKEND_SECTIONS = ['hero', 'statistics', 'features', 'how_it_works', 'pitch', 'fda', 'intro', 'mission', 'team', 'details', 'phone', 'email', 'address'];
 
 test('each page has all three state blocks', () => {
   for (const name of readdirSync(new URL('pages/', system)).filter((file) => file.endsWith('.md'))) {
@@ -151,7 +153,7 @@ test('the pages and the contact block name only parts the backend sends', () => 
     assert.ok(marked('data-odin-field').length > 0, `${name} marks no field`);
     // Only the connection check shows the site basics as fields. A page built from sections shows
     // them with data-odin-basic, because a field inside a section's element is one of its parts.
-    const fields = name === 'pages/connection.md' ? SITE_FIELDS : SECTION_PARTS;
+    const fields = name === 'pages/connection.md' ? SITE_FIELDS : [...SECTION_PARTS, ...ITEM_PARTS];
     for (const field of marked('data-odin-field')) {
       assert.ok(fields.includes(field), `${name} marks the field ${field}, which it would not be given`);
     }
@@ -177,10 +179,9 @@ test('every page in the ODIN menus exists, at the address the menu gives', () =>
   const menu = [...block.matchAll(/^\s+- \{ title: "([^"]+)", url: "([^"]+)" \}$/gm)].map(([, title, url]) => ({ title, url }));
   const permalinks = readdirSync(new URL('pages/', system))
     .map((name) => readFileSync(new URL(`pages/${name}`, system), 'utf8').match(/^permalink: (\S+)$/m)?.[1]);
-  // The About page is the next task. Until it lands, its menu entries are the only ones excused.
-  const pending = ['/about/'];
+  assert.ok(menu.length >= 3, 'the ODIN menus list fewer than three entries');
   for (const { title, url } of menu) {
-    assert.ok(permalinks.includes(url) || pending.includes(url), `the menu entry ${title} leads to ${url}, which no ODIN page has`);
+    assert.ok(permalinks.includes(url), `the menu entry ${title} leads to ${url}, which no ODIN page has`);
   }
 });
 

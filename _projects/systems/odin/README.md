@@ -5,9 +5,9 @@ ODIN is the website for ODIN Diagnostics. It is a registered system project like
 copies them to the paths Jekyll reads.
 
 So far it has the layout every ODIN page uses (header, menu and footer), the
-scripts that read content from the backend, the home page, the Contact Us page,
-the contact block those two share, and one page that checks the connection. The
-About page comes in a later task.
+scripts that read content from the backend, the three pages of the site (home,
+About and Contact Us), the contact block that home and Contact Us share, and one
+page that checks the connection.
 
 ## Content comes from the backend
 
@@ -37,8 +37,8 @@ on the site, and `sass/main.scss` shows them again inside the ODIN layout.
 
 Styles are in `sass/main.scss`. Every color is a theme variable, and the classes
 start with `odin__`. Page content uses the shared OCS grammar. The pages add a
-few `odin__` classes where the grammar has none: the hero's sizes and the partner
-logo.
+few `odin__` classes where the grammar has none: the hero's sizes, text with line
+breaks in it, a person's photo and the partner logo.
 
 ## The scripts
 
@@ -63,8 +63,11 @@ logo.
   - `data-odin-href="link"` takes the section's link.
   - `data-odin-image` takes the section's image and its description.
   - `data-odin-items` marks a list. The `<template>` inside it is copied once
-    per item of the section, and `data-odin-field` in the template takes the
-    item's `title` and `text`.
+    per item of the section. In the template, `data-odin-field` takes the item's
+    `title`, `text`, `subtitle` or `note`, and also the section's `action` (the
+    words on a control every item has). `data-odin-href="link"` takes the item's
+    link. `data-odin-image` takes the item's image, and is taken out of the copy
+    for an item that has none, such as a person without a photo.
 
   Anywhere inside the element handed to `showPage`, `data-odin-basic="<key>"`
   takes a site basic, such as `phone`. Add `data-odin-opens="tel"` or `"mailto"`
@@ -118,6 +121,9 @@ edit the sources here.
 backend's `contact` page and the site basics, as `pages/home.md` and
 `pages/contact.md` do.
 
+`pages/about.md` is the About page, at `/about/`: the title, the mission and the
+team. It took the place of the template's own `navigation/about.md`.
+
 `pages/contact.md` is the Contact Us page, at `/contact/`: the page's title and
 the line under it, then the contact block.
 
@@ -140,8 +146,8 @@ node --test _projects/systems/odin/tests/*.test.mjs
 ```
 
 To check the pages in a browser, start Flask on port 8587 and the site with
-`make`. The home page is at `http://localhost:4500/ODIN_Frontend/`, Contact Us
-at `http://localhost:4500/ODIN_Frontend/contact/` and the connection check at
-`http://localhost:4500/ODIN_Frontend/odin/connection/`.
+`make`. The home page is at `http://localhost:4500/ODIN_Frontend/`, with About at
+`/ODIN_Frontend/about/`, Contact Us at `/ODIN_Frontend/contact/` and the
+connection check at `/ODIN_Frontend/odin/connection/`.
 Stop Flask and
 reload to see the unavailable message.
