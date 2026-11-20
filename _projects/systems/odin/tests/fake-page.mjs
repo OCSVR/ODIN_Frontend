@@ -11,6 +11,8 @@ const DATASET_KEYS = {
   '[data-odin-href]': 'odinHref',
   '[data-odin-section]': 'odinSection',
   '[data-odin-image]': 'odinImage',
+  '[data-odin-items]': 'odinItems',
+  '[data-odin-basic]': 'odinBasic',
   '[data-odin-frame]': 'odinFrame',
   '[data-odin-logo]': 'odinLogo',
   '[data-odin-nav]': 'odinNav',
@@ -47,4 +49,21 @@ export function container(children, dataset = {}, options = {}) {
     querySelectorAll: (selector) => new Set(matching(selector)),
     querySelector: (selector) => matching(selector)[0] ?? null,
   };
+}
+
+// A list marked data-odin-items. Its <template> is stood in for by `makeCopy`, which builds what a
+// browser would clone from it; pass null for a list with no template. `copies` is what the list
+// holds besides its template.
+export function itemList(makeCopy) {
+  const template = makeCopy ? { content: { cloneNode: () => makeCopy() } } : null;
+  const list = {
+    ...element({ odinItems: '' }),
+    copies: [],
+    querySelector: (selector) => {
+      if (selector !== 'template') throw new Error(`The fake list cannot read the selector ${selector}`);
+      return template;
+    },
+    replaceChildren(...nodes) { list.copies = nodes.filter((node) => node !== template); },
+  };
+  return list;
 }
