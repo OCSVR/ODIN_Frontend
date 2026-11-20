@@ -1,0 +1,19 @@
+{%- comment -%}
+  The ODIN header: the logo, which comes from the backend, and the menu, which is the list
+  odin.nav in _config.yml. The logo link stays hidden until the site basics arrive.
+{%- endcomment -%}
+<header class="odin__header">
+  <div class="odin__bar">
+    <a class="odin__brand" href="{{ '/' | relative_url }}" data-odin-frame hidden>
+      <img class="odin__logo" data-odin-logo alt="">
+    </a>
+    <nav class="odin__nav" aria-label="Main" data-odin-nav>
+      <button class="ocs__btn medium odin__menu-toggle" type="button" aria-expanded="false" aria-controls="odin-menu" data-odin-menu-toggle hidden>Menu</button>
+      <ul class="odin__menu" id="odin-menu">
+        {%- for item in site.odin.nav %}
+        <li><a class="odin__menu-link" href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title | escape }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

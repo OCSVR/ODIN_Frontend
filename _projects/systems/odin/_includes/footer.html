@@ -1,0 +1,31 @@
+{%- comment -%}
+  The ODIN footer. The logo, tagline, social link addresses and copyright line come from the
+  backend, and each part that shows them stays hidden until they arrive. The two lists of links
+  are odin.social and odin.footer_nav in _config.yml.
+{%- endcomment -%}
+<footer class="odin__footer">
+  <div class="odin__footer-columns">
+    <div class="odin__footer-brand" data-odin-frame hidden>
+      <a class="odin__brand" href="{{ '/' | relative_url }}">
+        <img class="odin__logo odin__logo--small" data-odin-logo alt="">
+      </a>
+      <p class="ocs__text" data-odin-field="tagline"></p>
+      <div class="ocs__links">
+        {%- for item in site.odin.social %}
+        <a class="ocs__btn small" data-odin-href="{{ item.field }}" target="_blank" rel="noopener noreferrer">{{ item.title | escape }}</a>
+        {%- endfor %}
+      </div>
+    </div>
+    <nav aria-label="{{ site.odin.footer_nav.title | escape }}">
+      <h2 class="odin__footer-title">{{ site.odin.footer_nav.title | escape }}</h2>
+      <ul class="odin__footer-list">
+        {%- for item in site.odin.footer_nav.items %}
+        <li><a href="{{ item.url | relative_url }}">{{ item.title | escape }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+  </div>
+  <div class="odin__copyright" data-odin-frame hidden>
+    <p class="ocs__text" data-odin-field="copyright"></p>
+  </div>
+</footer>

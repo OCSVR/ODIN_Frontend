@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<head>
+  {%- comment -%}
+  The frame of every ODIN Diagnostics page: its own header, menu and footer around the page's
+  content. The head has the site's stylesheet, the theme fonts and user-preferences.js, so the page
+  follows the visitor's color theme, and nothing else from the OCS site head: no OCS navbar, no
+  sign-in check, no analytics, no keyboard shortcuts. The font list matches _includes/head-custom.html.
+  {%- endcomment -%}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {%- comment -%} The company's name is content, so the script adds it to the title once the backend has sent it. {%- endcomment %}
+  <title>{{ page.title | escape }}</title>
+  {%- if page.description %}
+  <meta name="description" content="{{ page.description | escape }}">
+  {%- endif %}
+  {%- if page.search_exclude %}
+  <meta name="robots" content="noindex">
+  {%- endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+</head>
+<body class="odin">
+  <a class="odin__skip" href="#odin-main">Skip to the content</a>
+  {%- include projects/odin/header.html -%}
+  <main class="odin__main" id="odin-main">
+    {{ content }}
+  </main>
+  {%- include projects/odin/footer.html -%}
+  <script type="module">
+    // Jekyll fills in the site's baseurl here. The odin modules are handed the Flask backend, so
+    // they never import config.js themselves.
+    import { fetchOptions, pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { Backend } from '{{ site.baseurl }}/assets/js/login/backend.js';
+    import { createContent } from '{{ site.baseurl }}/assets/js/projects/odin/content.js';
+    import { startFrame } from '{{ site.baseurl }}/assets/js/projects/odin/site-frame.js';
+
+    const content = createContent(new Backend(pythonURI, fetchOptions));
+    startFrame({ root: document, load: () => content.site(), imageUrl: content.imageUrl });
+  </script>
+</body>
+</html>
